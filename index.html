@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Avaliação de Atendimento - PGM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="role-screen">
+    <div class="logo">⭐ <span>Avaliação PGM</span></div>
+    <p class="subtitle">Selecione como deseja entrar</p>
+
+    <div class="role-cards">
+      <div class="role-card avaliador" onclick="window.location.href='avaliador.html'">
+        <div class="role-card-icon">🧑‍💼</div>
+        <div class="role-card-title">Avaliador</div>
+        <div class="role-card-desc">Registrar avaliações de atendimento. Acesso apenas ao formulário.</div>
+        <div class="role-card-arrow">›</div>
+      </div>
+
+      <div class="role-card programador" onclick="openPwdModal()">
+        <div class="role-card-icon">🛠️</div>
+        <div class="role-card-title">Programador</div>
+        <div class="role-card-desc">Acesso completo: Dashboard, relatórios e exportação para Power BI.</div>
+        <div class="role-card-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pwd-modal">
+    <div class="pwd-box">
+      <h2>🔒 Acesso Programador</h2>
+      <p>Digite a senha para acessar o painel completo.</p>
+      <div class="pwd-input-wrap">
+        <input type="password" id="pwd-input" class="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') confirmPwd()" />
+        <span class="pwd-toggle" onclick="togglePwd()">👁</span>
+      </div>
+      <div class="pwd-error" id="pwd-error"></div>
+      <div class="pwd-actions">
+        <button class="pwd-cancel" onclick="closePwdModal()">Cancelar</button>
+        <button class="pwd-confirm" onclick="confirmPwd()">Entrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

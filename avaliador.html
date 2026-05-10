@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Avaliador - Sistema de Avaliação PGM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body onload="initAvaliador()">
+
+  <header class="gov-header">
+    <div class="gov-logo-container">
+      <img src="logo-prefeitura-PGM.svg" alt="Prefeitura Geral do Município" class="gov-logo" />
+      <span class="gov-brand-text">Procuradoria Geral do Município</span>
+      <span class="gov-separator">|</span>
+      <span class="gov-app-title">AVALIADOR</span>
+    </div>
+    <button class="btn-voltar" onclick="window.location.href='index.html'">Voltar</button>
+  </header>
+
+  <main class="screen-container">
+    <div class="form-wrapper">
+      <p class="section-label">Seu nome</p>
+      <div class="avaliador-wrap">
+        <span class="avaliador-icon">🧑</span>
+        <input type="text" id="avaliador-input" class="avaliador-input"
+          placeholder="Digite seu nome completo"
+          maxlength="80" oninput="checkSubmit()" onblur="validateAvaliador()" autocomplete="name" />
+        <div class="avaliador-hint" id="avaliador-hint">Por favor, informe seu nome completo (mínimo 3 letras e um sobrenome).</div>
+      </div>
+
+      <p class="section-label">Selecione quem lhe atendeu</p>
+      <div class="attendant-grid" id="attendant-grid"></div>
+
+      <p class="section-label">Como avalia o atendimento?</p>
+      <div class="rating-grid">
+        <button class="rating-btn" data-val="Ótimo" onclick="selectRating(this)"><span class="emoji">😄</span>Ótimo</button>
+        <button class="rating-btn" data-val="Bom"   onclick="selectRating(this)"><span class="emoji">🙂</span>Bom</button>
+        <button class="rating-btn" data-val="Médio" onclick="selectRating(this)"><span class="emoji">😐</span>Médio</button>
+        <button class="rating-btn" data-val="Ruim"  onclick="selectRating(this)"><span class="emoji">😞</span>Ruim</button>
+      </div>
+
+      <p class="section-label">Comentário opcional</p>
+      <div class="feedback-wrap">
+        <textarea id="feedback-box" class="feedback-box"
+          placeholder="Deixe seu comentário, elogio ou crítica…"
+          maxlength="300" oninput="updateCounter(this)"></textarea>
+        <div class="feedback-counter" id="feedback-counter">0 / 300</div>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitRating()" disabled>Enviar Avaliação</button>
+    </div>
+  </main>
+
+  <div class="success-toast" id="toast">✅ Avaliação registrada!</div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Programador - Painel PGM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body onload="initProgramador()">
+
+  <header class="app-header">
+    <div class="header-left">
+      <h1>🛠️ Painel Programador</h1>
+    </div>
+    <div class="header-right">
+      <span class="badge" id="total-badge">0 avaliações</span>
+      <button class="btn-sair" onclick="window.location.href='index.html'">Sair</button>
+    </div>
+  </header>
+
+  <div class="tabs" id="tab-bar">
+    <div class="tab active" id="tab-dashboard" onclick="switchTab('dashboard')">Dashboard</div>
+    <div class="tab" id="tab-exportar" onclick="switchTab('exportar')">Exportar</div>
+  </div>
+
+  <main class="screen-container">
+    
+    <section class="screen active" id="screen-dashboard">
+      <div class="dash-subtabs">
+        <div class="dash-subtab active" onclick="switchDashView('geral')">🌐 Geral</div>
+        <div class="dash-subtab"        onclick="switchDashView('atendente')">👤 Por Atendente</div>
+      </div>
+
+      <div class="dash-view active" id="dash-geral">
+        <div class="stats-row">
+          <div class="stat-card otimo"><div class="num" id="cnt-otimo">0</div><div class="lbl">Ótimo</div></div>
+          <div class="stat-card bom">  <div class="num" id="cnt-bom">0</div><div class="lbl">Bom</div></div>
+          <div class="stat-card medio"><div class="num" id="cnt-medio">0</div><div class="lbl">Médio</div></div>
+          <div class="stat-card ruim"> <div class="num" id="cnt-ruim">0</div><div class="lbl">Ruim</div></div>
+        </div>
+        
+        <div class="chart-section">
+          <div class="chart-title">Volume por atendente</div>
+          <div id="bars-container"></div>
+        </div>
+        
+        <div class="chart-section">
+          <div class="chart-title">Distribuição geral</div>
+          <div class="mini-bars" id="mini-bars"></div>
+        </div>
+      </div>
+
+      <div class="dash-view" id="dash-atendente">
+        <p class="section-label">Selecione o atendente</p>
+        <div class="att-chips" id="att-chips"></div>
+        
+        <div id="att-detail-area">
+          <div class="empty-state">
+            <div class="icon">👆</div>
+            Toque em um atendente acima para ver o detalhamento das notas e comentários.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-exportar">
+      <div class="export-card">
+        <h3>📥 Exportar dados para BI e Planilhas</h3>
+        <p>Baixe seus relatórios formatados em CSV compatíveis com Excel e Power BI.</p>
+        <div class="export-actions">
+          <button class="export-btn csv" onclick="exportCSV()">⬇ Baixar CSV</button>
+          <button class="export-btn json" onclick="exportJSON()">⬇ Baixar JSON</button>
+        </div>
+      </div>
+      
+      <div class="export-card">
+        <h3>📋 Visualização Rápida (Preview)</h3>
+        <div id="preview-area"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
