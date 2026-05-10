@@ -1,51 +1,99 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Avaliação de Atendimento - PGM</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <!-- Google Fonts: importa as fontes Syne (títulos/destaques) e DM Sans (texto geral) -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
+  <!-- ══════════════════════════════════════════
+       TELA DE SELEÇÃO DE PAPEL (role-screen)
+       ══════════════════════════════════════════
+       Exibida logo ao abrir o sistema. Permite
+       escolher entre o modo Avaliador (formulário)
+       ou Programador (painel + dashboard).
+       ══════════════════════════════════════════ -->
   <div id="role-screen">
+    <!-- Logo principal: emoji + nome do sistema em azul -->
     <div class="logo">⭐ <span>Avaliação PGM</span></div>
+    <!-- Subtítulo orientativo para o usuário -->
+
     <p class="subtitle">Selecione como deseja entrar</p>
 
+    <!-- Container dos dois cards de seleção -->
     <div class="role-cards">
+
+      <!-- ── Card do Avaliador ──
+           onclick redireciona diretamente para avaliador.html,
+           pois não requer senha. -->
       <div class="role-card avaliador" onclick="window.location.href='avaliador.html'">
         <div class="role-card-icon">🧑‍💼</div>
         <div class="role-card-title">Avaliador</div>
         <div class="role-card-desc">Registrar avaliações de atendimento. Acesso apenas ao formulário.</div>
+        <!-- Seta visual indicando que é clicável -->
         <div class="role-card-arrow">›</div>
       </div>
 
+      <!-- ── Card do Programador ──
+           onclick chama openPwdModal() (definida em app.js) para
+           exibir o modal de senha antes de redirecionar ao painel. -->
       <div class="role-card programador" onclick="openPwdModal()">
         <div class="role-card-icon">🛠️</div>
         <div class="role-card-title">Programador</div>
         <div class="role-card-desc">Acesso completo: Dashboard, relatórios e exportação para Power BI.</div>
+        <!-- Seta visual indicando que é clicável -->
         <div class="role-card-arrow">›</div>
       </div>
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════
+       MODAL DE SENHA (pwd-modal)
+       ══════════════════════════════════════════
+       Janela flutuante exibida quando o usuário
+       clica em "Programador". Fica oculta por
+       padrão (display: none no CSS) e é ativada
+       via JS com a classe "open".
+       ══════════════════════════════════════════ -->
   <div id="pwd-modal">
     <div class="pwd-box">
+      <!-- Cabeçalho do modal -->
       <h2>🔒 Acesso Programador</h2>
       <p>Digite a senha para acessar o painel completo.</p>
+      <!-- Campo de senha com botão de mostrar/ocultar -->
       <div class="pwd-input-wrap">
-        <input type="password" id="pwd-input" class="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') confirmPwd()" />
+        <!-- type="password" mascara os caracteres com "•••".
+             onkeydown permite enviar com a tecla Enter. -->
+        <input type="password" id="pwd-input" class="pwd-input" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter') confirmPwd()" />
+        <!-- Botão de olho: chama togglePwd() para alternar entre senha visível/oculta -->
         <span class="pwd-toggle" onclick="togglePwd()">👁</span>
       </div>
+
+      <!-- Área onde aparece a mensagem "Senha incorreta" (preenchida via JS) -->
       <div class="pwd-error" id="pwd-error"></div>
+      <!-- Botões de ação do modal -->
       <div class="pwd-actions">
+        <!-- Cancelar: fecha o modal sem fazer nada -->
         <button class="pwd-cancel" onclick="closePwdModal()">Cancelar</button>
+        <!-- Entrar: chama confirmPwd() que verifica o hash SHA-256 da senha -->
         <button class="pwd-confirm" onclick="confirmPwd()">Entrar</button>
       </div>
     </div>
   </div>
 
+  <!-- Carrega o script principal do sistema.
+       Fica no final do <body> para garantir que todo o HTML
+       já esteja carregado antes de o JS tentar manipulá-lo. -->
   <script src="./app.js"></script>
 </body>
+
 </html>
