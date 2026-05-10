@@ -1,60 +1,121 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Avaliador - Sistema de Avaliação PGM</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Fontes: Syne para títulos, DM Sans para o corpo do texto -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
+<!-- onload="initAvaliador()" chama a função de inicialização
+     assim que o HTML terminar de carregar.
+     initAvaliador() cria dinamicamente os cards dos atendentes no grid. -->
+
 <body onload="initAvaliador()">
 
+  <!-- ══════════════════════════════════════════
+       CABEÇALHO INSTITUCIONAL (gov-header)
+       ══════════════════════════════════════════
+       Barra verde no estilo da Prefeitura de Fortaleza,
+       com logo, nome da instituição e botão de voltar.
+       ══════════════════════════════════════════ -->
   <header class="gov-header">
     <div class="gov-logo-container">
+      <!-- Logo SVG da Prefeitura/PGM -->
       <img src="logo-prefeitura-PGM.svg" alt="Prefeitura Geral do Município" class="gov-logo" />
       <span class="gov-brand-text">Procuradoria Geral do Município</span>
+      <!-- Separador visual entre o nome da instituição e o título do app -->
       <span class="gov-separator">|</span>
       <span class="gov-app-title">AVALIADOR</span>
     </div>
+    <!-- Botão que retorna à tela inicial -->
     <button class="btn-voltar" onclick="window.location.href='index.html'">Voltar</button>
   </header>
 
+  <!-- ══════════════════════════════════════════
+       CONTEÚDO PRINCIPAL — FORMULÁRIO
+       ══════════════════════════════════════════
+       Centralizado por .screen-container, contém
+       todos os campos do formulário de avaliação.
+       ══════════════════════════════════════════ -->
   <main class="screen-container">
     <div class="form-wrapper">
+      <!-- ── SEÇÃO 1: Nome do avaliador ── -->
       <p class="section-label">Seu nome</p>
       <div class="avaliador-wrap">
+        <!-- Ícone posicionado absolutamente dentro do wrapper (via CSS) -->
         <span class="avaliador-icon">🧑</span>
-        <input type="text" id="avaliador-input" class="avaliador-input"
-          placeholder="Digite seu nome completo"
+        <!-- Campo de texto para o nome.
+             oninput="checkSubmit()" — verifica em tempo real se o formulário pode ser enviado.
+             onblur="validateAvaliador()" — valida o nome quando o campo perde o foco.
+             autocomplete="name" — sugere nomes salvos no navegador. -->
+        <input type="text" id="avaliador-input" class="avaliador-input" placeholder="Digite seu nome completo"
           maxlength="80" oninput="checkSubmit()" onblur="validateAvaliador()" autocomplete="name" />
-        <div class="avaliador-hint" id="avaliador-hint">Por favor, informe seu nome completo (mínimo 3 letras e um sobrenome).</div>
+        <!-- Dica de erro: visível apenas quando o nome é inválido (via JS + classe "show") -->
+        <div class="avaliador-hint" id="avaliador-hint">Por favor, informe seu nome completo (mínimo 3 letras e um
+          sobrenome).</div>
       </div>
 
+      <!-- ── SEÇÃO 2: Seleção do atendente ── -->
       <p class="section-label">Selecione quem lhe atendeu</p>
+
+      <!-- Grid vazio que será preenchido dinamicamente por initAvaliador() em app.js.
+           Para cada nome em ATENDENTES[], a função cria e insere um card aqui. -->
       <div class="attendant-grid" id="attendant-grid"></div>
 
+      <!-- ── SEÇÃO 3: Avaliação do atendimento ── -->
       <p class="section-label">Como avalia o atendimento?</p>
+      <!-- Grid 2x2 com os 4 botões de nota.
+           data-val é o atributo lido por selectRating() em app.js
+           para saber qual nota foi escolhida. -->
       <div class="rating-grid">
-        <button class="rating-btn" data-val="Ótimo" onclick="selectRating(this)"><span class="emoji">😄</span>Ótimo</button>
-        <button class="rating-btn" data-val="Bom"   onclick="selectRating(this)"><span class="emoji">🙂</span>Bom</button>
-        <button class="rating-btn" data-val="Médio" onclick="selectRating(this)"><span class="emoji">😐</span>Médio</button>
-        <button class="rating-btn" data-val="Ruim"  onclick="selectRating(this)"><span class="emoji">😞</span>Ruim</button>
+        <button class="rating-btn" data-val="Ótimo" onclick="selectRating(this)"><span
+            class="emoji">😄</span>Ótimo</button>
+        <button class="rating-btn" data-val="Bom" onclick="selectRating(this)"><span class="emoji">🙂</span>Bom</button>
+        <button class="rating-btn" data-val="Médio" onclick="selectRating(this)"><span
+            class="emoji">😐</span>Médio</button>
+        <button class="rating-btn" data-val="Ruim" onclick="selectRating(this)"><span
+            class="emoji">😞</span>Ruim</button>
       </div>
 
+      <!-- ── SEÇÃO 4: Comentário opcional ── -->
       <p class="section-label">Comentário opcional</p>
       <div class="feedback-wrap">
-        <textarea id="feedback-box" class="feedback-box"
-          placeholder="Deixe seu comentário, elogio ou crítica…"
+        <!-- maxlength="300" limita no nível do HTML.
+             oninput="updateCounter(this)" atualiza o contador em tempo real.
+             "this" passa a referência ao próprio textarea para a função. -->
+        <textarea id="feedback-box" class="feedback-box" placeholder="Deixe seu comentário, elogio ou crítica…"
           maxlength="300" oninput="updateCounter(this)"></textarea>
+
+        <!-- Contador de caracteres. Atualizado via JS pela função updateCounter(). -->
         <div class="feedback-counter" id="feedback-counter">0 / 300</div>
       </div>
 
+      <!-- ── BOTÃO DE ENVIO ──
+           Começa desabilitado (disabled).
+           Só é habilitado via JS quando nome, atendente e nota estão preenchidos.
+           onclick chama submitRating() que salva a avaliação e limpa o formulário. -->
       <button class="submit-btn" id="submit-btn" onclick="submitRating()" disabled>Enviar Avaliação</button>
     </div>
   </main>
 
+  <!-- ══════════════════════════════════════════
+       TOAST DE CONFIRMAÇÃO
+       ══════════════════════════════════════════
+       Notificação que sobe da parte inferior da tela
+       após o envio bem-sucedido. Fica oculto por padrão
+       e é exibido via JS com a classe "show". -->
   <div class="success-toast" id="toast">✅ Avaliação registrada!</div>
 
+  <!-- Script principal — carregado ao final para garantir
+       que todos os elementos HTML já existam no DOM -->
   <script src="./app.js"></script>
 </body>
+
 </html>
