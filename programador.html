@@ -1,87 +1,183 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Programador - Painel PGM</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Fontes do Google: Syne para títulos, DM Sans para o corpo -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
+<!-- onload="initProgramador()" inicializa o painel assim que a página carregar.
+     Essa função chama updateDashboard() e switchDashView('geral') para
+     popular os dados e exibir a view inicial. -->
+
 <body onload="initProgramador()">
 
+
+  <!-- ══════════════════════════════════════════
+       CABEÇALHO DO PAINEL
+   ══════════════════════════════════════════
+       Barra superior escura com título, badge de
+       total de avaliações e botão de sair. -->
   <header class="app-header">
     <div class="header-left">
       <h1>🛠️ Painel Programador</h1>
     </div>
     <div class="header-right">
+      <!-- Badge atualizado dinamicamente via JS com o total de avaliações registradas -->
       <span class="badge" id="total-badge">0 avaliações</span>
+
+      <!-- Botão que retorna à tela inicial (index.html) -->
       <button class="btn-sair" onclick="window.location.href='index.html'">Sair</button>
     </div>
   </header>
 
+  <!-- ══════════════════════════════════════════
+       ABAS PRINCIPAIS DE NAVEGAÇÃO
+       ══════════════════════════════════════════
+       "Dashboard" exibe estatísticas e gráficos.
+       "Exportar" permite baixar os dados em CSV/JSON.
+       switchTab() em app.js controla qual aba está ativa. -->
   <div class="tabs" id="tab-bar">
     <div class="tab active" id="tab-dashboard" onclick="switchTab('dashboard')">Dashboard</div>
     <div class="tab" id="tab-exportar" onclick="switchTab('exportar')">Exportar</div>
   </div>
 
+  <!-- ══════════════════════════════════════════
+       CONTEÚDO PRINCIPAL
+       ══════════════════════════════════════════
+       Cada <section> corresponde a uma aba.
+       Apenas a section com classe "active" é exibida (via CSS).
+       ══════════════════════════════════════════ -->
   <main class="screen-container">
-    
+
+    <!-- ────────────────────────────────────────
+         ABA: DASHBOARD (screen-dashboard)
+         ──────────────────────────────────────── -->
     <section class="screen active" id="screen-dashboard">
+
+      <!-- Sub-abas internas do dashboard:
+           "🌐 Geral" mostra os dados consolidados de todos os atendentes.
+           "👤 Por Atendente" permite selecionar um atendente e ver seus detalhes.
+           switchDashView() em app.js alterna entre as duas views. -->
       <div class="dash-subtabs">
         <div class="dash-subtab active" onclick="switchDashView('geral')">🌐 Geral</div>
-        <div class="dash-subtab"        onclick="switchDashView('atendente')">👤 Por Atendente</div>
+        <div class="dash-subtab" onclick="switchDashView('atendente')">👤 Por Atendente</div>
       </div>
 
+      <!-- ── View: Geral (dash-geral) ──
+           Exibe contadores de notas e dois gráficos de barras.
+           Visível por padrão (classe "active" aplicada via JS na inicialização). -->
       <div class="dash-view active" id="dash-geral">
+
+        <!-- 4 cards de contagem: um para cada nota possível.
+             Os números são atualizados via JS pela função updateDashboard(). -->
         <div class="stats-row">
-          <div class="stat-card otimo"><div class="num" id="cnt-otimo">0</div><div class="lbl">Ótimo</div></div>
-          <div class="stat-card bom">  <div class="num" id="cnt-bom">0</div><div class="lbl">Bom</div></div>
-          <div class="stat-card medio"><div class="num" id="cnt-medio">0</div><div class="lbl">Médio</div></div>
-          <div class="stat-card ruim"> <div class="num" id="cnt-ruim">0</div><div class="lbl">Ruim</div></div>
+          <div class="stat-card otimo">
+            <div class="num" id="cnt-otimo">0</div>
+            <div class="lbl">Ótimo</div>
+          </div>
+          <div class="stat-card bom">
+            <div class="num" id="cnt-bom">0</div>
+            <div class="lbl">Bom</div>
+          </div>
+          <div class="stat-card medio">
+            <div class="num" id="cnt-medio">0</div>
+            <div class="lbl">Médio</div>
+          </div>
+          <div class="stat-card ruim">
+            <div class="num" id="cnt-ruim">0</div>
+            <div class="lbl">Ruim</div>
+          </div>
         </div>
-        
+
+        <!-- Gráfico: Volume total de avaliações por atendente.
+             O conteúdo (linhas de barra) é gerado dinamicamente
+             em updateDashboard() e injetado em #bars-container. -->
         <div class="chart-section">
           <div class="chart-title">Volume por atendente</div>
           <div id="bars-container"></div>
+          <!-- Preenchido dinamicamente via JS -->
         </div>
-        
+
+        <!-- Gráfico: Distribuição percentual de cada nota no total.
+             Ex: "Ótimo — ████████ — 12 (40.0%)"
+             Conteúdo injetado dinamicamente em #mini-bars pelo JS. -->
         <div class="chart-section">
           <div class="chart-title">Distribuição geral</div>
           <div class="mini-bars" id="mini-bars"></div>
+          <!-- Preenchido dinamicamente via JS -->
         </div>
-      </div>
 
+      </div>
+      <!-- /dash-geral -->
+
+      <!-- ── View: Por Atendente (dash-atendente) ──
+           Oculta por padrão; exibida ao clicar na sub-aba "👤 Por Atendente".
+           Mostra chips clicáveis e, ao selecionar um, exibe detalhes daquele atendente. -->
       <div class="dash-view" id="dash-atendente">
         <p class="section-label">Selecione o atendente</p>
+        <!-- Container dos chips (botões compactos) de cada atendente.
+             Preenchido dinamicamente por buildAttChips() em app.js. -->
         <div class="att-chips" id="att-chips"></div>
-        
+        <!-- Exemplo do que será gerado: <div class="att-chip">👤 Alexandre (3)</div> -->
+
+        <!-- Área onde os detalhes do atendente selecionado são exibidos.
+             Preenchida por showAttendantDetails() quando um chip é clicado. -->
         <div id="att-detail-area">
+          <!-- Estado inicial: instrução para o usuário interagir -->
           <div class="empty-state">
             <div class="icon">👆</div>
             Toque em um atendente acima para ver o detalhamento das notas e comentários.
           </div>
         </div>
-      </div>
-    </section>
 
+      </div>
+      <!-- /dash-atendente -->
+    </section>
+    <!-- /screen-dashboard -->
+
+    <!-- ────────────────────────────────────────
+         ABA: EXPORTAR (screen-exportar)
+         ────────────────────────────────────────
+         Permite baixar os dados em CSV ou JSON.
+         Também exibe uma prévia rápida dos dados no painel. -->
     <section class="screen" id="screen-exportar">
+
+      <!-- Card de exportação de arquivos -->
       <div class="export-card">
         <h3>📥 Exportar dados para BI e Planilhas</h3>
         <p>Baixe seus relatórios formatados em CSV compatíveis com Excel e Power BI.</p>
         <div class="export-actions">
+          <!-- exportCSV() gera e baixa um arquivo .csv com separador ";" e BOM UTF-8 -->
           <button class="export-btn csv" onclick="exportCSV()">⬇ Baixar CSV</button>
+          <!-- exportJSON() gera e baixa um arquivo .json com todos os dados brutos -->
           <button class="export-btn json" onclick="exportJSON()">⬇ Baixar JSON</button>
         </div>
       </div>
-      
+
+      <!-- Card de preview: exibe as 5 avaliações mais recentes em uma tabela HTML.
+           O conteúdo é gerado por renderPreview() em app.js quando esta aba é acessada. -->
       <div class="export-card">
         <h3>📋 Visualização Rápida (Preview)</h3>
         <div id="preview-area"></div>
+        <!-- Preenchido dinamicamente via JS com uma <table class="preview-table"> -->
       </div>
+
     </section>
+    <!-- /screen-exportar -->
 
   </main>
-
+  <!-- Script principal — carregado ao final para garantir
+       que todos os elementos HTML já existam no DOM antes
+       de o JavaScript tentar manipulá-los -->
   <script src="./app.js"></script>
 </body>
+
 </html>
