@@ -13,107 +13,120 @@
   8. Sub-abas e views do dashboard
   9. Toast de sucesso
   10. Tabela de preview de exportação
+
+
+  #FDECD8 → Bege/pêssego suave  — fundo geral da página
+  #00A896 → Verde-água (teal)   — cor primária da marca
+  #F05A28 → Laranja vibrante    — cor de destaque e ações
+  #2D2D2D → Quase preto         — texto principal
+  #7A7A7A → Cinza médio         — texto secundário/apagado
   ============================================================
 */
 
 
+
 /* ══════════════════════════════════════════
-   1. VARIÁVEIS CSS (Custom Properties)
+   1. VARIÁVEIS CSS — DESIGN TOKENS
    ══════════════════════════════════════════
-   Definidas em :root, ficam disponíveis globalmente.
-   Facilita manter um tema consistente: basta alterar
-   aqui para mudar em todo o sistema ao mesmo tempo.
+   :root define variáveis globais acessíveis
+   em qualquer seletor via var(--nome).
+   Centralizar as cores aqui significa que
+   basta mudar um valor para refletir em
+   todo o sistema ao mesmo tempo.
    ══════════════════════════════════════════ */
 :root {
-  --bg:         #0d1117; /* Fundo geral da página (preto azulado escuro) */
-  --surface:    #131d2e; /* Superfície dos cards e painéis (azul bem escuro) */
-  --border:     #21262d; /* Cor das bordas e separadores */
-  --text:       #e6edf3; /* Cor principal do texto (branco suave) */
-  --muted:      #7d8590; /* Texto secundário / labels apagados (cinza) */
-
-  /* Cores semânticas de cada nota de avaliação */
-  --otimo:      #2ea043; /* Verde */
-  --bom:        #1f6feb; /* Azul */
-  --medio:      #d29922; /* Amarelo/âmbar */
-  --ruim:       #da3633; /* Vermelho */
-
-  /* Versões com transparência das cores acima, usadas como fundo
-     dos botões de nota quando selecionados (efeito "glow" suave) */
-  --otimo-glow: rgba(46,160,67,0.15);
-  --bom-glow:   rgba(31,111,235,0.15);
-  --medio-glow: rgba(210,153,34,0.15);
-  --ruim-glow:  rgba(218,54,51,0.15);
+  /* ── Fundos ── */
+  --bg:           #FDECD8; /* Bege pêssego — fundo geral (identidade Fortaleza Digital) */
+  --surface:      #FFFFFF; /* Branco puro — superfície de cards e formulários */
+  --border:       #E8D5C0; /* Bege mais escuro — bordas e separadores suaves */
+ 
+  /* ── Texto ── */
+  --text:         #2D2D2D; /* Quase preto — texto principal (alto contraste sobre o bege) */
+  --muted:        #7A7A7A; /* Cinza médio — labels, placeholders e texto secundário */
+ 
+  /* ── Cores da marca Fortaleza Digital ── */
+  --teal:         #00A896; /* Verde-água — cor primária (headers, abas, seleções) */
+  --teal-dark:    #008578; /* Teal escurecido — usado no :hover de elementos teal */
+  --teal-light:   rgba(0, 168, 150, 0.12); /* Teal com 12% de opacidade — ring de foco */
+ 
+  --orange:       #F05A28; /* Laranja — cor de destaque (botões de ação, faixa do header) */
+  --orange-dark:  #D44B1E; /* Laranja escurecido — usado no :hover de elementos laranja */
+  --orange-light: rgba(240, 90, 40, 0.12); /* Laranja com 12% de opacidade — reservado */
+ 
+  /* ── Semântica das notas de avaliação ── */
+  --otimo: #00A896; /* Ótimo = teal (reforça a identidade da marca no melhor resultado) */
+  --bom:   #4CAF82; /* Bom   = verde médio */
+  --medio: #F0A028; /* Médio = âmbar/dourado */
+  --ruim:  #E53935; /* Ruim  = vermelho */
+ 
+  /* ── Glows dos botões de nota (fundo ao selecionar) ──
+     Versões com baixa opacidade usadas como background
+     quando o botão está no estado .selected            */
+  --otimo-glow: rgba(0,   168, 150, 0.14);
+  --bom-glow:   rgba(76,  175, 130, 0.14);
+  --medio-glow: rgba(240, 160,  40, 0.14);
+  --ruim-glow:  rgba(229,  57,  53, 0.14);
 }
-
-
+ 
+ 
 /* ══════════════════════════════════════════
    2. RESET GLOBAL
    ══════════════════════════════════════════
-   Remove margens, paddings e o modelo de caixa
-   inconsistente que os navegadores aplicam por padrão.
-   box-sizing: border-box faz padding e border
-   serem incluídos no tamanho total do elemento.
+   Remove margens, paddings e o modelo de
+   caixa inconsistente padrão dos navegadores.
+   box-sizing: border-box faz com que padding
+   e border sejam contados dentro do tamanho
+   declarado do elemento (não somados por fora).
    ══════════════════════════════════════════ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'DM Sans', sans-serif; /* Fonte principal do conteúdo */
-  min-height: 100vh;                  /* Ocupa pelo menos a altura total da tela */
+  background: var(--bg);          /* Fundo bege em toda a página */
+  color: var(--text);             /* Cor padrão do texto */
+  font-family: 'DM Sans', sans-serif; /* Fonte principal do sistema */
+  min-height: 100vh;              /* Garante que o fundo cubra a tela inteira */
 }
-
-
+ 
+ 
 /* ══════════════════════════════════════════
-   3. HEADER GOVERNAMENTAL
+   3. HEADER GOVERNAMENTAL (.gov-header)
    ══════════════════════════════════════════
-   Barra superior verde no estilo da identidade
-   visual da Prefeitura de Fortaleza.
-   Aparece apenas em avaliador.html.
+   Barra superior verde-água com a identidade
+   da Prefeitura de Fortaleza. Aparece apenas
+   em avaliador.html. A faixa laranja embaixo
+   reproduz a separação cromática da marca.
    ══════════════════════════════════════════ */
 .gov-header {
-  background-color: #107F63;              /* Verde institucional */
+  background-color: var(--teal);        /* Verde-água institucional */
   color: white;
   display: flex;
-  justify-content: space-between;        /* Logo à esquerda, botão à direita */
+  justify-content: space-between;       /* Logo à esquerda, botão à direita */
   align-items: center;
   padding: 12px 20px;
-  border-bottom: 3px solid #ff9100;      /* Sublinha laranja da identidade visual */
+  border-bottom: 3px solid var(--orange); /* Faixa laranja separando o header do conteúdo */
 }
-
-.gov-logo-container {
-  display: flex;
-  align-items: center;
-  gap: 8px; /* Espaçamento entre logo, texto e separador */
-}
-
-.gov-logo {
-  height: 28px; /* Mantém proporção da imagem SVG */
-}
-
-.gov-brand-text {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-/* Traço vertical "|" entre o nome da instituição e o título do app */
-.gov-separator {
-  color: rgba(255, 255, 255, 0.4); /* Branco translúcido para ser discreto */
-  font-size: 1.1rem;
-}
-
-.gov-app-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: 0.05em; /* Espaçamento entre letras (efeito label) */
-}
-
-/* Botões "Voltar" (avaliador) e "Sair" (programador) compartilham o mesmo estilo */
+ 
+/* Container interno que agrupa logo + textos */
+.gov-logo-container { display: flex; align-items: center; gap: 8px; }
+ 
+/* Imagem SVG da logo — altura fixa mantém a proporção */
+.gov-logo { height: 28px; }
+ 
+/* Nome da instituição em fonte pesada */
+.gov-brand-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+ 
+/* Traço "|" entre o nome da instituição e o título do app */
+.gov-separator { color: rgba(255,255,255,0.45); font-size: 1.1rem; }
+ 
+/* Ex: "AVALIADOR" — letras espaçadas em caixa alta */
+.gov-app-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.06em; }
+ 
+/* ── Botões "Voltar" (avaliador) e "Sair" (programador) ──
+   Compartilham o mesmo estilo: laranja sobre teal,
+   contrastante e fácil de encontrar visualmente.    */
 .btn-voltar, .btn-sair {
-  background-color: #ff9100; /* Laranja da identidade visual */
-  color: #000;
+  background-color: var(--orange);
+  color: #fff;
   border: none;
   border-radius: 6px;
   padding: 6px 14px;
@@ -121,148 +134,133 @@ body {
   font-weight: 700;
   font-size: 0.78rem;
   cursor: pointer;
+  transition: background 0.15s; /* Suaviza a transição de cor no hover */
 }
-
-.btn-voltar:hover {
-  background-color: #ffaa33; /* Versão mais clara do laranja no hover */
-}
-
-
+ 
+/* Escurece o laranja quando o cursor passa por cima */
+.btn-voltar:hover, .btn-sair:hover { background-color: var(--orange-dark); }
+ 
+ 
 /* ══════════════════════════════════════════
    4. TELA DE SELEÇÃO DE PAPEL (index.html)
    ══════════════════════════════════════════
-   Exibida na tela inicial onde o usuário
+   Tela inicial do sistema onde o usuário
    escolhe entre "Avaliador" e "Programador".
+   Centralizada vertical e horizontalmente
+   usando Flexbox.
    ══════════════════════════════════════════ */
 #role-screen {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;      /* Centraliza horizontalmente */
-  justify-content: center;  /* Centraliza verticalmente */
+  align-items: center;     /* Centraliza horizontalmente */
+  justify-content: center; /* Centraliza verticalmente */
   padding: 24px;
 }
-
-/* Logo "⭐ Avaliação PGM" no topo da tela */
-#role-screen .logo {
-  font-family: 'Syne', sans-serif;
-  font-size: 2rem;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-
-#role-screen .logo span { color: #58a6ff; } /* "Avaliação PGM" em azul */
-
-#role-screen .subtitle {
-  font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 40px;
-}
-
-/* Container dos dois cards de seleção (Avaliador e Programador) */
-.role-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 100%;
-  max-width: 360px; /* Limita a largura para não esticar demais em telas grandes */
-}
-
-/* Card individual de seleção de papel */
+ 
+/* Logo principal: "⭐ Avaliação PGM"
+   "Avaliação" herda o teal do pai; "PGM" sobrescreve para laranja */
+#role-screen .logo { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--teal); margin-bottom: 6px; }
+#role-screen .logo span { color: var(--orange); }
+ 
+/* Subtítulo discreto abaixo do logo */
+#role-screen .subtitle { font-size: 0.85rem; color: var(--muted); margin-bottom: 40px; }
+ 
+/* Container dos dois cards — coluna única, centralizado, máx. 360px */
+.role-cards { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 360px; }
+ 
+/* Card base — branco com borda suave e sombra leve */
 .role-card {
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 18px;
   padding: 22px 20px;
   cursor: pointer;
-  position: relative; /* Necessário para o posicionamento da seta "›" */
+  position: relative;     /* Necessário para posicionar a seta "›" absolutamente */
+  transition: box-shadow 0.18s, border-color 0.18s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
-
-.role-card-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.05rem;
-  margin-bottom: 4px;
-}
-
-.role-card-desc {
-  font-size: 0.8rem;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-
+ 
+/* No hover: borda teal + sombra esverdeada para dar sensação de elevação */
+.role-card:hover { box-shadow: 0 4px 16px rgba(0,168,150,0.15); border-color: var(--teal); }
+ 
+/* Faixa colorida no topo de cada card identifica o tipo de acesso:
+   teal = Avaliador (acesso aberto), laranja = Programador (acesso restrito) */
+.role-card.avaliador   { border-top: 4px solid var(--teal); }
+.role-card.programador { border-top: 4px solid var(--orange); }
+ 
+.role-card-icon  { font-size: 1.8rem; margin-bottom: 8px; }
+.role-card-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; margin-bottom: 4px; color: var(--text); }
+.role-card-desc  { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+ 
+/* Seta "›" posicionada absolutamente no meio vertical do card */
+.role-card-arrow { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; }
+.role-card.avaliador   .role-card-arrow { color: var(--teal); }
+.role-card.programador .role-card-arrow { color: var(--orange); }
+ 
+ 
 /* ══════════════════════════════════════════
    5. TELA DO AVALIADOR (avaliador.html)
    ══════════════════════════════════════════
    Formulário de avaliação: campo de nome,
-   grid de atendentes, botões de nota e
-   campo de comentário.
+   grid de atendentes, botões de nota,
+   textarea de comentário e botão de envio.
    ══════════════════════════════════════════ */
-
-/* Wrapper central que limita e centraliza o conteúdo em telas largas */
-.screen-container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 24px 16px 80px; /* Padding inferior extra para não colidir com o botão fixo */
-}
-
-/* Label de seção em maiúsculas espaçadas (ex: "SEU NOME", "SELECIONE...") */
+ 
+/* Wrapper central que limita a largura e centraliza o conteúdo.
+   O padding-bottom generoso evita que o botão fique atrás
+   de barras de navegação em dispositivos móveis.            */
+.screen-container { max-width: 500px; margin: 0 auto; padding: 24px 16px 80px; }
+ 
+/* Label de seção: "SEU NOME", "COMO AVALIA?" etc.
+   text-transform + letter-spacing criam o estilo de tag/etiqueta */
 .section-label {
   font-family: 'Syne', sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.09em;
   margin: 20px 0 10px;
 }
-
-/* Wrapper do input de nome — position: relative permite
-   posicionar o ícone de emoji absolutamente dentro dele */
+ 
+/* ── Campo de nome do avaliador ── */
+ 
+/* position: relative no wrapper permite posicionar o ícone
+   absolutamente dentro do mesmo espaço do input           */
 .avaliador-wrap { position: relative; }
-
+ 
 .avaliador-input {
   width: 100%;
   background: var(--surface);
   border: 1.5px solid var(--border);
   border-radius: 14px;
   color: var(--text);
-  padding: 13px 14px 13px 42px; /* Padding esquerdo maior para não sobrepor o ícone */
+  padding: 13px 14px 13px 42px; /* Padding esquerdo maior para não cobrir o ícone emoji */
   outline: none;
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-
-/* Classe adicionada via JS quando o nome é inválido */
+ 
+/* Ring de foco teal: borda muda de cor + anel suave ao redor */
+.avaliador-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+ 
+/* Borda vermelha quando o nome não atende às regras de validação */
 .avaliador-input.invalid { border-color: var(--ruim); }
-
-/* Ícone de emoji posicionado absolutamente dentro do wrapper */
-.avaliador-icon {
-  position: absolute;
-  left: 13px;
-  top: 50%;
-  transform: translateY(-50%); /* Centraliza verticalmente no wrapper */
-}
-
-/* Mensagem de ajuda exibida abaixo do input quando o nome é inválido */
-.avaliador-hint {
-  font-size: 0.65rem;
-  color: var(--ruim);
-  margin-top: 5px;
-  display: none; /* Oculta por padrão */
-}
-
-/* Classe "show" adicionada via JS para tornar o hint visível */
+ 
+/* Emoji 🧑 posicionado absolutamente no centro vertical do input */
+.avaliador-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); }
+ 
+/* Mensagem de ajuda abaixo do input — oculta por padrão.
+   A classe .show é adicionada via JS quando o nome é inválido. */
+.avaliador-hint { font-size: 0.65rem; color: var(--ruim); margin-top: 5px; display: none; }
 .avaliador-hint.show { display: block; }
-
-
-/* Grid 2 colunas para os cards dos atendentes */
-.attendant-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 colunas de tamanho igual */
-  gap: 12px;
-}
-
-/* Card de cada atendente */
+ 
+/* ── Grid de cards de atendentes ── */
+ 
+/* 2 colunas de tamanho igual — adapta ao espaço disponível */
+.attendant-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+ 
 .attendant-card {
   background: var(--surface);
   border: 1.5px solid var(--border);
@@ -270,33 +268,28 @@ body {
   padding: 20px 12px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.18s; /* Suaviza as mudanças de estilo ao selecionar */
+  transition: all 0.18s; /* Suaviza todas as mudanças de estilo (borda, sombra, fundo) */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
-
-/* Estado selecionado: borda azul + sombra azul suave */
+ 
+/* Destaca com borda teal quando o cursor está sobre o card */
+.attendant-card:hover { border-color: var(--teal); }
+ 
+/* Estado selecionado: borda teal + anel de foco + fundo levemente esverdeado */
 .attendant-card.selected {
-  border-color: #58a6ff;
-  box-shadow: 0 0 0 3px rgba(88,166,255,0.15);
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px var(--teal-light);
+  background: #F0FBFA; /* Verde-água bem claro, quase branco */
 }
-
-.attendant-avatar {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-}
-
-.attendant-name {
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-
-
-/* Grid 2 colunas para os 4 botões de nota */
-.rating-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
+ 
+.attendant-avatar { font-size: 1.5rem; margin-bottom: 8px; }
+.attendant-name   { font-weight: 600; font-size: 0.85rem; color: var(--text); }
+ 
+/* ── Botões de nota (Ótimo, Bom, Médio, Ruim) ── */
+ 
+/* Grade 2x2 */
+.rating-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+ 
 .rating-btn {
   padding: 16px 8px;
   border-radius: 14px;
@@ -310,26 +303,34 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  transition: all 0.18s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
-
-/* Estado selecionado do botão de nota.
-   --c e --g são variáveis locais definidas abaixo para cada nota.
-   Usa a cor da borda e o fundo "glow" correspondente à nota. */
+ 
+/* No hover: borda na cor da nota + sobe 1px (efeito de elevação).
+   var(--c, var(--teal)) usa teal como fallback se --c não estiver definida */
+.rating-btn:hover { border-color: var(--c, var(--teal)); transform: translateY(-1px); }
+ 
+/* Quando selecionado: borda e fundo na cor da nota correspondente
+   --c = cor da borda  |  --g = cor do fundo (glow translúcido)
+   Ambas são variáveis locais definidas por nota nos seletores abaixo */
 .rating-btn.selected {
   border-color: var(--c);
   background: var(--g);
-  transform: scale(1.02); /* Leve aumento de escala para feedback visual */
+  transform: scale(1.02); /* Leve aumento de escala para feedback tátil */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
-
-/* Define as variáveis locais --c (cor da borda) e --g (fundo glow)
-   para cada botão de nota, baseadas nas variáveis globais do :root */
+ 
+.rating-btn .emoji { font-size: 1.4rem; }
+ 
+/* Cada botão define suas próprias variáveis locais --c e --g
+   usando as variáveis globais semânticas do :root            */
 .rating-btn[data-val="Ótimo"] { --c: var(--otimo); --g: var(--otimo-glow); }
 .rating-btn[data-val="Bom"]   { --c: var(--bom);   --g: var(--bom-glow);   }
 .rating-btn[data-val="Médio"] { --c: var(--medio);  --g: var(--medio-glow); }
 .rating-btn[data-val="Ruim"]  { --c: var(--ruim);   --g: var(--ruim-glow);  }
-
-
-/* Textarea de comentário opcional */
+ 
+/* ── Textarea de comentário ── */
 .feedback-box {
   width: 100%;
   min-height: 90px;
@@ -338,64 +339,72 @@ body {
   border-radius: 14px;
   color: var(--text);
   padding: 12px;
-  resize: none;   /* Impede que o usuário redimensione o textarea manualmente */
+  resize: none;   /* Impede redimensionamento manual pelo usuário */
   outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-
-/* Contador "X / 300" exibido abaixo do textarea */
-.feedback-counter {
-  text-align: right;
-  font-size: 0.65rem;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-/* Botão principal de envio */
+ 
+/* Mesmo ring de foco teal aplicado ao input de nome */
+.feedback-box:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+ 
+/* Contador "X / 300" abaixo do textarea, alinhado à direita */
+.feedback-counter { text-align: right; font-size: 0.65rem; color: var(--muted); margin-top: 4px; }
+ 
+/* ── Botão de envio ──
+   CTA principal da tela: laranja chamativo.
+   Desabilitado por padrão — habilitado via JS
+   quando os 3 campos obrigatórios estão válidos. */
 .submit-btn {
   width: 100%;
   padding: 16px;
   border-radius: 14px;
-  background: #58a6ff;              /* Azul quando habilitado */
-  color: #0d1117;
+  background: var(--orange);
+  color: #fff;
   font-family: 'Syne', sans-serif;
   font-weight: 800;
   border: none;
   cursor: pointer;
   margin-top: 14px;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  transition: background 0.15s, transform 0.1s;
 }
-
-/* Estado desabilitado: cinza e cursor "não permitido"
-   (o atributo HTML disabled é controlado via JS) */
-.submit-btn:disabled {
-  background: var(--border);
-  color: var(--muted);
-  cursor: not-allowed;
-}
-
-
+ 
+/* Escurece e sobe levemente no hover — só quando habilitado */
+.submit-btn:hover:not(:disabled) { background: var(--orange-dark); transform: translateY(-1px); }
+ 
+/* Estado desabilitado: cinza neutro + cursor "proibido" */
+.submit-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+ 
+ 
 /* ══════════════════════════════════════════
-   6. MODAL DE SENHA
+   6. MODAL DE SENHA (#pwd-modal)
    ══════════════════════════════════════════
    Janela flutuante de login do programador.
-   Usa position: fixed para sobrepor toda a tela.
-   O fundo escurecido (backdrop) usa rgba e blur.
+   Cobre toda a tela com fundo escurecido e
+   borrado (backdrop-filter: blur).
+   Oculta por padrão; exibida quando a classe
+   "open" é adicionada via JS.
    ══════════════════════════════════════════ */
 #pwd-modal {
-  display: none;           /* Oculto por padrão */
+  display: none;           /* Oculto até receber a classe .open */
   position: fixed;
-  inset: 0;                /* Atalho para top/right/bottom/left: 0 */
+  inset: 0;                /* Atalho para top/right/bottom/left: 0 — cobre toda a viewport */
   z-index: 300;            /* Fica acima de todo o conteúdo da página */
-  background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(4px); /* Borra o fundo visível atrás do modal */
+  background: rgba(45,45,45,0.55); /* Fundo semitransparente escuro */
+  backdrop-filter: blur(5px);      /* Desfoca o conteúdo atrás do modal */
   align-items: center;
   justify-content: center;
   padding: 24px;
 }
-
-/* Classe "open" é adicionada via JS para exibir o modal (muda display para flex) */
+ 
+/* Quando .open é adicionado via JS, muda display para flex
+   (necessário para que align-items/justify-content funcionem) */
 #pwd-modal.open { display: flex; }
-
-/* Caixa branca/escura do conteúdo do modal */
+ 
+/* Caixa branca do conteúdo do modal */
 .pwd-box {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -403,45 +412,40 @@ body {
   padding: 28px 24px;
   width: 100%;
   max-width: 340px; /* Limita a largura em telas grandes */
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15); /* Sombra profunda para destacar sobre o backdrop */
 }
-
-/* Wrapper do input de senha — position: relative para o botão de olho */
-.pwd-input-wrap {
-  position: relative;
-  margin-bottom: 8px;
-}
-
+ 
+.pwd-box h2 { color: var(--text); margin-bottom: 6px; font-family: 'Syne', sans-serif; }
+.pwd-box p  { color: var(--muted); font-size: 0.85rem; margin-bottom: 18px; }
+ 
+/* position: relative no wrapper permite posicionar o botão 👁 absolutamente */
+.pwd-input-wrap { position: relative; margin-bottom: 8px; }
+ 
 .pwd-input {
   width: 100%;
-  background: var(--bg);
+  background: var(--bg);  /* Fundo bege (diferente do branco do modal — leve hierarquia) */
   border: 1.5px solid var(--border);
   border-radius: 12px;
   color: var(--text);
   font-size: 1rem;
-  padding: 13px 44px 13px 14px; /* Padding direito para não sobrepor o ícone de olho */
+  padding: 13px 44px 13px 14px; /* Padding direito reserva espaço para o ícone 👁 */
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-
-/* Botão emoji 👁 para mostrar/ocultar a senha, posicionado absolutamente */
-.pwd-toggle {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-}
-
-/* Mensagem de erro ("Senha incorreta") em vermelho */
-.pwd-error {
-  font-size: 0.72rem;
-  color: var(--ruim);
-  margin-bottom: 16px;
-}
-
-/* Linha de botões do modal (Cancelar + Entrar) */
+ 
+/* Ring de foco teal — consistente com os outros inputs do sistema */
+.pwd-input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light); }
+ 
+/* Botão 👁 posicionado absolutamente dentro do wrapper do input */
+.pwd-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.6; }
+ 
+/* Área da mensagem de erro — min-height evita que o layout "pule" ao aparecer/sumir */
+.pwd-error { font-size: 0.72rem; color: var(--ruim); margin-bottom: 16px; min-height: 1em; }
+ 
+/* Linha de botões lado a lado */
 .pwd-actions { display: flex; gap: 10px; }
-
-/* Estilos compartilhados dos botões do modal */
+ 
+/* Estilos compartilhados dos dois botões do modal */
 .pwd-cancel, .pwd-confirm {
   padding: 12px;
   border-radius: 12px;
@@ -449,192 +453,213 @@ body {
   cursor: pointer;
   font-family: 'Syne', sans-serif;
   font-weight: 700;
+  transition: background 0.15s;
 }
-
-/* Botão "Cancelar": cinza discreto, ocupa menos espaço */
-.pwd-cancel {
-  background: var(--border);
-  color: var(--muted);
-  flex: 1; /* flex: 1 = ocupa 1 parte do espaço */
-}
-
-/* Botão "Entrar": azul destacado, ocupa o dobro do espaço do Cancelar */
-.pwd-confirm {
-  background: #58a6ff;
-  color: #0d1117;
-  flex: 2; /* flex: 2 = ocupa 2 partes (o dobro) */
-}
-
-
+ 
+/* Cancelar: discreto, ocupa 1 parte do espaço disponível */
+.pwd-cancel  { background: var(--border); color: var(--muted); flex: 1; }
+ 
+/* Entrar: teal destacado, ocupa 2 partes (o dobro do Cancelar) */
+.pwd-confirm { background: var(--teal); color: #fff; flex: 2; }
+ 
+.pwd-cancel:hover  { background: #ddd0c4; }           /* Bege levemente mais escuro */
+.pwd-confirm:hover { background: var(--teal-dark); }  /* Teal escurecido */
+ 
+ 
 /* ══════════════════════════════════════════
-   7. DASHBOARD / PAINEL DO PROGRAMADOR
+   7. PAINEL DO PROGRAMADOR (programador.html)
    ══════════════════════════════════════════
-   Header, abas de navegação, cards de
-   estatísticas e gráficos de barras.
+   Header teal, abas de navegação principal,
+   cards de estatísticas e gráficos de barras.
    ══════════════════════════════════════════ */
-
-/* Cabeçalho do painel do programador */
+ 
+/* Header do painel — mesmo padrão visual do gov-header */
 .app-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 16px;
+  background: var(--teal);
+  border-bottom: 3px solid var(--orange); /* Faixa laranja separando header do conteúdo */
+  padding: 14px 20px;
   display: flex;
-  justify-content: space-between; /* Título à esquerda, badge+botão à direita */
+  justify-content: space-between;
   align-items: center;
 }
-
-/* Barra de abas principais (Dashboard | Exportar) */
-.tabs {
-  display: flex;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+.app-header h1 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; color: #fff; }
+ 
+/* Badge "X avaliações" no canto superior direito
+   Fundo branco translúcido sobre teal cria efeito "glass" */
+.badge {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 50px; /* Formato de pílula */
+  margin-right: 10px;
+  font-family: 'Syne', sans-serif;
 }
-
-/* Cada aba individual */
+ 
+/* ── Abas principais: Dashboard | Exportar ── */
+.tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); }
+ 
 .tab {
-  flex: 1;             /* Cada aba ocupa metade da barra */
+  flex: 1;            /* Cada aba ocupa metade igual da barra */
   text-align: center;
   padding: 14px;
   font-weight: 600;
   font-size: 0.9rem;
-  color: var(--muted); /* Cinza quando inativa */
+  color: var(--muted);     /* Cinza quando inativa */
   cursor: pointer;
-  border-bottom: 2px solid transparent; /* Borda invisível por padrão */
+  border-bottom: 2px solid transparent; /* Linha invisível — fica teal quando ativa */
+  transition: color 0.15s, border-color 0.15s;
 }
-
-/* Aba ativa: texto branco + linha azul embaixo */
-.tab.active {
-  color: var(--text);
-  border-bottom-color: #58a6ff;
-}
-
-/* Seções de conteúdo: ocultas por padrão, exibidas quando ativas */
-.screen { display: none; }
+ 
+/* Aba ativa: texto teal + linha teal embaixo */
+.tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+ 
+/* Hover em abas inativas: texto levemente mais escuro */
+.tab:hover:not(.active) { color: var(--text); }
+ 
+/* Seções de conteúdo: ocultas por padrão, visíveis com .active */
+.screen        { display: none; }
 .screen.active { display: block; }
-
-/* Grid 4 colunas para os 4 cards de estatísticas (Ótimo, Bom, Médio, Ruim) */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-/* Card de estatística individual */
+ 
+/* ── Cards de estatísticas (Ótimo / Bom / Médio / Ruim) ── */
+ 
+/* Grade 4 colunas — um card por nota */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+ 
 .stat-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px;
   text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
-
-/* Número grande dentro do card */
-.stat-card .num {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 800;
-}
-
-/* Cada card herda a cor da sua nota correspondente */
-.stat-card.otimo .num { color: var(--otimo); }
-.stat-card.bom .num   { color: var(--bom);   }
-.stat-card.medio .num { color: var(--medio); }
-.stat-card.ruim .num  { color: var(--ruim);  }
-
-/* Container de seção de gráfico com fundo, borda e arredondamento */
+ 
+/* Número grande em fonte pesada */
+.stat-card .num { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; }
+ 
+/* Label pequeno abaixo do número */
+.stat-card .lbl { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+ 
+/* Cor do número varia conforme o tipo do card */
+.stat-card.otimo .num { color: var(--otimo); } /* Teal */
+.stat-card.bom .num   { color: var(--bom);   } /* Verde médio */
+.stat-card.medio .num { color: var(--medio); } /* Âmbar */
+.stat-card.ruim .num  { color: var(--ruim);  } /* Vermelho */
+ 
+/* ── Seção de gráfico (container branco com borda) ── */
 .chart-section {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 16px;
   margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
-
-/* Título interno de cada seção de gráfico */
+ 
+/* Título interno da seção de gráfico — estilo de label discreta */
 .chart-title {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--muted);
   text-transform: uppercase;
+  letter-spacing: 0.07em;
   margin-bottom: 14px;
 }
-
-/* ── Componentes das barras horizontais dos gráficos ── */
-
-/* Linha completa de uma barra (label + trilho + contador) */
-.bar-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-/* Nome do atendente ou da nota, à esquerda da barra */
-.bar-label {
-  width: 80px;
-  font-size: 0.78rem;
-  font-weight: 500;
-}
-
-/* Fundo cinza escuro que serve como "trilho" da barra */
+ 
+/* ── Componentes das barras horizontais dos gráficos ──
+   Cada barra é composta por:
+   .bar-row    → linha completa (label + trilho + contador)
+   .bar-label  → nome do atendente ou da nota
+   .bar-track  → trilho cinza de fundo
+   .bar-fill   → preenchimento colorido proporcional ao valor
+   .bar-count  → número à direita                           */
+ 
+.bar-row   { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.bar-label { width: 80px; font-size: 0.78rem; font-weight: 500; color: var(--text); }
+ 
 .bar-track {
-  flex: 1;          /* Ocupa todo o espaço disponível entre label e contador */
+  flex: 1;            /* Ocupa todo o espaço disponível entre label e contador */
   height: 10px;
-  background: var(--border);
-  border-radius: 50px; /* Extremidades arredondadas */
-  overflow: hidden;    /* Garante que o fill não ultrapasse o trilho */
+  background: var(--border); /* Trilho bege — representa 0% */
+  border-radius: 50px;
+  overflow: hidden;   /* Garante que o fill não ultrapasse o trilho arredondado */
 }
-
-/* Parte colorida da barra (preenchida proporcionalmente via JS) */
+ 
 .bar-fill {
   height: 100%;
   border-radius: 50px;
+  transition: width 0.4s ease; /* Animação suave ao carregar os dados */
+  /* A largura e a cor são aplicadas via style="" pelo JavaScript */
 }
-
-/* Número à direita da barra */
-.bar-count {
-  width: 30px;
-  font-size: 0.78rem;
-  text-align: right;
-  color: var(--muted);
-}
-
-/* Chips (botões compactos) de atendente na sub-aba "Por Atendente" */
-.att-chips {
-  display: flex;
-  flex-wrap: wrap; /* Permite quebrar para nova linha se necessário */
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
+ 
+.bar-count { width: 30px; font-size: 0.78rem; text-align: right; color: var(--muted); }
+ 
+/* ── Chips de atendente (sub-aba "Por Atendente") ──
+   Botões em formato de pílula, um por atendente.
+   A borda esquerda colorida é aplicada via JS. */
+.att-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+ 
 .att-chip {
   padding: 8px 16px;
-  border-radius: 50px;       /* Formato de pílula */
+  border-radius: 50px;       /* Formato pílula */
   border: 1.5px solid var(--border);
   background: var(--surface);
   font-size: 0.8rem;
   cursor: pointer;
-  /* A borda esquerda colorida é aplicada via JS com a cor do atendente */
+  color: var(--text);
+  transition: background 0.15s, border-color 0.15s;
 }
-
-
+.att-chip:hover { border-color: var(--teal); }
+ 
+/* ── Cards da aba Exportar ── */
+.export-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.export-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; margin-bottom: 6px; color: var(--text); }
+.export-card p  { font-size: 0.85rem; color: var(--muted); margin-bottom: 16px; }
+ 
+/* Container dos botões de download lado a lado */
+.export-actions { display: flex; gap: 10px; }
+ 
+.export-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.export-btn:hover { transform: translateY(-1px); } /* Todos os botões sobem no hover */
+ 
+/* CSV = teal (cor primária) | JSON = laranja (cor de destaque) */
+.export-btn.csv  { background: var(--teal);   color: #fff; }
+.export-btn.json { background: var(--orange); color: #fff; }
+.export-btn.csv:hover  { background: var(--teal-dark);   }
+.export-btn.json:hover { background: var(--orange-dark); }
+ 
+ 
 /* ══════════════════════════════════════════
-   8. SUB-ABAS E VIEWS DO DASHBOARD
+   8. SUB-ABAS DO DASHBOARD
    ══════════════════════════════════════════
-   Sistema de abas internas do dashboard:
-   "🌐 Geral" e "👤 Por Atendente".
+   Sistema de abas internas: "🌐 Geral" e
+   "👤 Por Atendente". Funciona igual às abas
+   principais, mas com escopo menor (dentro
+   da seção do dashboard).
    ══════════════════════════════════════════ */
-
-/* Container das sub-abas, com linha separadora embaixo */
-.dash-subtabs {
-  display: flex;
-  gap: 0;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-/* Sub-aba individual */
+ 
+/* Container das sub-abas com linha separadora embaixo */
+.dash-subtabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+ 
 .dash-subtab {
   padding: 10px 18px;
   font-size: 0.85rem;
@@ -644,92 +669,82 @@ body {
   border-bottom: 2px solid transparent; /* Linha invisível até ficar ativa */
   transition: color 0.15s, border-color 0.15s;
 }
-
-/* Sub-aba ativa: texto claro + linha azul */
-.dash-subtab.active {
-  color: var(--text);
-  border-bottom-color: #58a6ff;
-}
-
-/* Views (painéis) das sub-abas: ocultos por padrão */
-.dash-view { display: none; }
-
-/* View ativa: visível */
+ 
+/* Sub-aba ativa: teal — igual ao padrão das abas principais */
+.dash-subtab.active { color: var(--teal); border-bottom-color: var(--teal); }
+ 
+/* Painéis das views: ocultos por padrão, exibidos quando .active */
+.dash-view        { display: none; }
 .dash-view.active { display: block; }
-
-/* O gráfico de distribuição geral precisa de mais espaço
-   pois exibe "X (33.3%)" — width maior que o padrão */
+ 
+/* O gráfico de distribuição geral exibe "X (33.3%)" — precisa de mais espaço */
 .mini-bars .bar-count { width: 72px; }
-
+ 
 /* Estado vazio: exibido quando não há dados ou nenhum atendente foi selecionado */
-.empty-state {
-  text-align: center;
-  color: var(--muted);
-  padding: 40px 20px;
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.empty-state .icon {
-  font-size: 2rem;
-  margin-bottom: 10px;
-}
-
-
+.empty-state { text-align: center; color: var(--muted); padding: 40px 20px; font-size: 0.9rem; line-height: 1.6; }
+.empty-state .icon { font-size: 2rem; margin-bottom: 10px; }
+ 
+ 
 /* ══════════════════════════════════════════
-   9. TOAST DE SUCESSO
+   9. TOAST DE SUCESSO (.success-toast)
    ══════════════════════════════════════════
    Notificação flutuante que aparece brevemente
-   após o envio bem-sucedido de uma avaliação.
-   Usa translateY para animar de baixo para cima.
+   após o envio de uma avaliação. Usa translateY
+   para animar: começa fora da tela (100px abaixo)
+   e sobe até a posição visível quando .show é
+   adicionado pelo JavaScript.
    ══════════════════════════════════════════ */
 .success-toast {
   position: fixed;
   bottom: 20px;
   left: 50%;
-
-  /* Estado inicial: fora da tela (100px abaixo) e centralizado horizontalmente */
-  transform: translateX(-50%) translateY(100px);
-
-  background: var(--otimo); /* Verde */
+  transform: translateX(-50%) translateY(100px); /* Estado inicial: fora da tela, centralizado */
+  background: var(--teal);
   color: white;
   padding: 12px 24px;
-  border-radius: 50px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  transition: transform 0.3s ease; /* Suaviza a animação de entrada/saída */
-  z-index: 1000; /* Acima de tudo */
+  border-radius: 50px;   /* Formato de pílula */
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  box-shadow: 0 4px 16px rgba(0,168,150,0.4); /* Sombra esverdeada combina com o fundo teal */
+  transition: transform 0.3s ease;             /* Suaviza a animação de entrada e saída */
+  z-index: 1000;                               /* Acima de todos os outros elementos */
 }
-
-/* Quando a classe "show" é adicionada via JS:
-   o toast sobe para a posição visível (translateY(0)) */
-.success-toast.show {
-  transform: translateX(-50%) translateY(0);
-}
-
-
+ 
+/* Quando .show é adicionado via JS:
+   translateY(0) traz o toast para dentro da tela */
+.success-toast.show { transform: translateX(-50%) translateY(0); }
+ 
+ 
 /* ══════════════════════════════════════════
    10. TABELA DE PREVIEW (aba Exportar)
    ══════════════════════════════════════════
-   Tabela HTML que mostra as 5 avaliações
-   mais recentes antes do download do CSV.
+   Tabela HTML que exibe as 5 avaliações mais
+   recentes antes do download do arquivo CSV.
+   border-collapse: collapse remove o espaço
+   duplo padrão entre bordas de células.
    ══════════════════════════════════════════ */
 .preview-table {
   width: 100%;
-  border-collapse: collapse; /* Remove o espaço duplo entre bordas de células */
+  border-collapse: collapse; /* Une as bordas adjacentes em uma linha única */
   font-size: 0.78rem;
   margin-top: 10px;
 }
-
-/* Cabeçalho da tabela com fundo cinza escuro */
+ 
+/* Cabeçalho: fundo bege com borda teal embaixo — destaca visualmente das células */
 .preview-table th {
-  background: var(--border);
+  background: var(--bg);
   padding: 8px;
   text-align: left;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--teal); /* Linha teal separa cabeçalho do corpo */
 }
-
-/* Células do corpo com linha separadora embaixo */
-.preview-table td {
-  padding: 8px;
-  border-bottom: 1px solid var(--border);
-}
+ 
+/* Células do corpo com linha separadora suave embaixo */
+.preview-table td { padding: 8px; border-bottom: 1px solid var(--border); color: var(--text); }
+ 
+/* Linha com fundo levemente alaranjado ao passar o mouse — facilita a leitura */
+.preview-table tr:hover td { background: #FDF4EC; }
