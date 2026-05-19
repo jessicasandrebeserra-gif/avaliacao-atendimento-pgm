@@ -157,7 +157,9 @@ function initAvaliador() {
 
     // Define o conteúdo interno do card (ícone + nome)
     card.innerHTML = `
-      <div class="attendant-avatar">🎧</div>
+      <div class="attendant-avatar">
+        <img src="pessoas.png" alt="Atendente" class="attendant-img" />
+      </div>
       <div class="attendant-name">${name}</div>
     `;
 
