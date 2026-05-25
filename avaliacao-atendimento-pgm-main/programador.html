@@ -13,11 +13,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<!-- onload="initProgramador()" inicializa o painel assim que a página carregar.
-     Essa função chama updateDashboard() e switchDashView('geral') para
-     popular os dados e exibir a view inicial. -->
-
-<body onload="initProgramador()">
+<body>
 
 
   <!-- ══════════════════════════════════════════
@@ -180,10 +176,6 @@
     <!-- /screen-exportar -->
 
   </main>
-  <!-- Script principal — carregado ao final para garantir
-       que todos os elementos HTML já existam no DOM antes
-       de o JavaScript tentar manipulá-los -->
-  <script src="./app.js"></script>
   <!-- Loader: tenta carregar como módulo e faz fallback para legacy (file:// friendly) -->
   <script>
     (function(){
@@ -192,6 +184,26 @@
         var m=document.createElement('script'); m.type='module'; m.src='./app.js'; m.onerror=loadLegacy; document.body.appendChild(m);
       }catch(e){ loadLegacy(); }
     })();
+  </script>
+
+  <!-- Inicializa o painel apenas quando as funções globais estiverem disponíveis -->
+  <script>
+    window.addEventListener('load', function () {
+      let attempts = 0;
+      function tryInit() {
+        if (window.initProgramador) {
+          window.initProgramador();
+          return;
+        }
+        attempts += 1;
+        if (attempts < 40) {
+          setTimeout(tryInit, 50);
+        } else {
+          console.warn('Não foi possível inicializar o painel do programador.');
+        }
+      }
+      tryInit();
+    });
   </script>
 </body>
 

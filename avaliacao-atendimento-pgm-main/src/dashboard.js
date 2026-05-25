@@ -106,16 +106,55 @@ export function updateDashboard() {
   if (subgroupBars) {
     subgroupBars.innerHTML = '';
     const total = data.length || 1;
-    const sortedSubgroups = Object.entries(subgroupCounts).sort((a, b) => b[1] - a[1]);
-    sortedSubgroups.forEach(([label, count]) => {
-      const percent = ((count / total) * 100).toFixed(1);
+    const subgroupMap = {};
+
+    data.forEach(d => {
+      const subgroups = Array.isArray(d.subgrupos)
+        ? d.subgrupos
+        : (d.subgrupo ? [d.subgrupo] : []);
+      const atendente = d.atendente || 'Sem atendente';
+
+      subgroups.forEach(sub => {
+        if (!subgroupMap[sub]) subgroupMap[sub] = {};
+        subgroupMap[sub][atendente] = (subgroupMap[sub][atendente] || 0) + 1;
+      });
+    });
+
+    const sortedSubgroups = Object.entries(subgroupMap)
+      .map(([label, attendants]) => ({
+        label,
+        totalCount: Object.values(attendants).reduce((sum, count) => sum + count, 0),
+        attendants
+      }))
+      .sort((a, b) => b.totalCount - a.totalCount);
+
+    sortedSubgroups.forEach(({ label, totalCount, attendants }) => {
+      const sortedAttendants = Object.entries(attendants).sort((a, b) => b[1] - a[1]);
+
       subgroupBars.innerHTML += `
         <div class="bar-row">
           <div class="bar-label" style="width: 120px; font-size: 0.75rem;">${label}</div>
-          <div class="bar-track" style="flex: 1; height: 10px; background: var(--border); border-radius: 50px; overflow: hidden;">
-            <div class="bar-fill" style="width: ${percent}%; background-color: #5c6ac4; height: 100%;"></div>
+          <div class="bar-track" style="flex: 1; height: 10px; background: var(--border); border-radius: 50px; overflow: hidden; display: flex; align-items: stretch;">
+            ${sortedAttendants.map(([att, count], index) => {
+              const attIndex = ATENDENTES.indexOf(att);
+              const color = CORES_GRAFICOS[(attIndex >= 0 ? attIndex : index) % CORES_GRAFICOS.length];
+              const segmentPercent = ((count / totalCount) * 100).toFixed(1);
+              const isFirst = index === 0;
+              const isLast = index === sortedAttendants.length - 1;
+              return `<div class="bar-fill" style="width: ${segmentPercent}%; background-color: ${color}; height: 100%; border-radius: ${isFirst ? '50px 0 0 50px' : isLast ? '0 50px 50px 0' : '0'};"></div>`;
+            }).join('')}
           </div>
-          <div class="bar-count" style="width: 48px; font-size: 0.72rem; text-align: right; color: var(--muted);">${count}</div>
+          <div class="bar-count" style="width: 48px; font-size: 0.72rem; text-align: right; color: var(--muted);">${totalCount}</div>
+        </div>
+        <div style="margin: -6px 0 12px 130px; display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.72rem; color: var(--muted);">
+          ${sortedAttendants.map(([att, count], index) => {
+            const attIndex = ATENDENTES.indexOf(att);
+            const color = CORES_GRAFICOS[(attIndex >= 0 ? attIndex : index) % CORES_GRAFICOS.length];
+            return `<span style="display: flex; align-items: center; gap: 4px;">
+              <span style="width: 10px; height: 10px; border-radius: 999px; background: ${color}; display: inline-block;"></span>
+              ${att} (${count})
+            </span>`;
+          }).join('')}
         </div>
       `;
     });
