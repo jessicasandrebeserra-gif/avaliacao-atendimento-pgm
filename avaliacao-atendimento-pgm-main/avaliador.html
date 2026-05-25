@@ -109,9 +109,15 @@
        e é exibido via JS com a classe "show". -->
   <div class="success-toast" id="toast">✅ Avaliação registrada!</div>
 
-  <!-- Script principal — carregado ao final para garantir
-       que todos os elementos HTML já existam no DOM -->
-  <script src="./app.js"></script>
+  <!-- Loader: tenta carregar como módulo e faz fallback para legacy (file:// friendly) -->
+  <script>
+    (function(){
+      function loadLegacy(){ var s=document.createElement('script'); s.src='./app.legacy.js'; document.body.appendChild(s); }
+      try{
+        var m=document.createElement('script'); m.type='module'; m.src='./app.js'; m.onerror=loadLegacy; document.body.appendChild(m);
+      }catch(e){ loadLegacy(); }
+    })();
+  </script>
 </body>
 
 </html>
