@@ -185,8 +185,6 @@ function selectRating(btn) {
   document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   selectedRating = btn.dataset.val;
-  // Ao selecionar uma nota, renderiza as opções de subgrupo correspondentes
-  renderSubgroupOptions(selectedRating);
   checkSubmit();
 }
 
@@ -232,101 +230,32 @@ function checkSubmit() {
   }
 }
 
-function getSelectedSubgroups() {
-  // Coleta os chips com classe .subgroup-chip.selected e retorna seus valores
-  const chips = Array.from(document.querySelectorAll('.subgroup-chip.selected'));
-  if (!chips.length) return [];
-  return chips.map(c => c.dataset.value || c.textContent.trim());
-}
-
-// Renderiza opções de subgrupo dependendo da nota selecionada
-function renderSubgroupOptions(nota) {
-  const mapping = {
-    'Ótimo': [
-      'Atendimento rápido',
-      'Muito educado',
-      'Resolveu meu problema',
-      'Explicação clara',
-      'Excelente organização',
-      'Superou expectativas'
-    ],
-    'Bom': [
-      'Atendimento satisfatório',
-      'Resolveu parcialmente',
-      'Boa educação',
-      'Tempo aceitável',
-      'Poderia ser mais rápido',
-      'Informações úteis'
-    ],
-    'Médio': [
-      'Demorou no atendimento',
-      'Informações confusas',
-      'Pouca atenção',
-      'Problema parcialmente resolvido',
-      'Falta de clareza',
-      'Atendimento regular'
-    ],
-    'Ruim': [
-      'Demora excessiva',
-      'Mau atendimento',
-      'Não resolveu o problema',
-      'Falta de educação',
-      'Informações erradas',
-      'Necessita melhoria e excluir o comentario'
-    ]
-  };
-
-  const container = document.getElementById('subgroup-container');
-  if (!container) return;
-
-  // Limpa container
-  container.innerHTML = '';
-
-  const options = mapping[nota] || [];
-  options.forEach(opt => {
-    const chip = document.createElement('div');
-    chip.className = 'subgroup-chip';
-    chip.dataset.value = opt;
-    chip.textContent = opt;
-    chip.onclick = () => toggleSubgroup(chip);
-    container.appendChild(chip);
-  });
-
-  // Atualiza o hidden input (compatibilidade) com valores vazios
-  const input = document.getElementById('subgroup-input');
-  if (input) input.value = '';
-}
-
-function toggleSubgroup(el) {
-  if (!el) return;
-  el.classList.toggle('selected');
-  // Atualiza o hidden input para compatibilidade com código antigo
-  const input = document.getElementById('subgroup-input');
-  if (input) input.value = getSelectedSubgroups().join(', ');
-}
-
 // Atualiza o contador de caracteres do campo de comentário em tempo real.
 // Exibe "X / 300" conforme o usuário digita.
-// (comentário removido) campo de comentário foi excluído da UI
+function updateCounter(textarea) {
+  const counter = document.getElementById('feedback-counter');
+  if (counter) {
+    counter.textContent = `${textarea.value.length} / 300`;
+  }
+}
 
 // Coleta os dados do formulário, cria um objeto de avaliação,
 // salva no localStorage, limpa o formulário e exibe o toast de confirmação.
 function submitRating() {
   const data = loadData();
   const avaliadorInput = document.getElementById('avaliador-input');
+  const feedbackInput = document.getElementById('feedback-box');
+
   const agora = new Date(); // Captura data e hora no momento do envio
   // Monta o objeto com todos os dados da avaliação.
   // O id usa Date.now() (milissegundos desde 1970) para ser único.
-  const subgroups = getSelectedSubgroups();
   const novaAvaliacao = {
     id: Date.now(),
     avaliador: avaliadorInput.value.trim(),
     atendente: selectedAttendant,
     avaliacao: selectedRating,
     peso: PESOS[selectedRating] || 0, // Busca o peso numérico da nota
-    // campo de comentário removido
-    subgrupos: subgroups,
-    subgrupo: subgroups[0] || '',
+    feedback: feedbackInput.value.trim(),
     data: agora.toLocaleDateString('pt-BR'), // Ex: "09/05/2026" no formato brasileiro
     hora: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), // Ex: "13:45" no formato brasileiro
     timestamp: agora.toISOString() // Armazena a data/hora em formato ISO (formato universal) para facilitar ordenação e exportação
@@ -339,18 +268,11 @@ function submitRating() {
   selectedAttendant = null;
   selectedRating = null;
   avaliadorInput.value = '';
-  // campo de comentário removido anteriormente — não existe mais
+  feedbackInput.value = '';
 
-  // Coloca o foco no campo de nome para facilitar novo envio
-  avaliadorInput.focus();
-
-  // Limpa seleção de subgrupos e o container de chips
-  const subgroupContainer = document.getElementById('subgroup-container');
-  if (subgroupContainer) subgroupContainer.innerHTML = '';
-  const subgroupInput = document.getElementById('subgroup-input');
-  if (subgroupInput) subgroupInput.value = '';
-
-  // comentário removido — nada para resetar
+  // Reseta o contador de caracteres do comentário
+  const counter = document.getElementById('feedback-counter');
+  if (counter) counter.textContent = '0 / 300';
 
   // Remove a seleção visual dos cards de atendente e dos botões de nota
   document.querySelectorAll('.attendant-card').forEach(c => c.classList.remove('selected'));
@@ -359,9 +281,6 @@ function submitRating() {
   // Desabilita o botão de envio novamente até que o usuário preencha os campos para uma nova avaliação
   const submitBtn = document.getElementById('submit-btn');
   if (submitBtn) submitBtn.disabled = true;
-
-  // Atualiza o estado do botão baseado nos campos atuais
-  checkSubmit();
 
   // Exibe o toast (notificação flutuante) de sucesso por 2,5 segundos.
   // A classe "show" aciona a animação CSS que desliza o toast para cima.
@@ -499,6 +418,17 @@ function updateDashboard() {
     });
   }
 
+  // Contagem de avaliações por subgrupo (caso o dado tenha o campo subgrupos).
+  const subgroupCounts = {};
+  data.forEach(d => {
+    if (Array.isArray(d.subgrupos)) {
+      d.subgrupos.forEach(sub => {
+        if (!sub) return;
+        subgroupCounts[sub] = (subgroupCounts[sub] || 0) + 1;
+      });
+    }
+  });
+
   // ── Gráfico de distribuição geral por nota (mini-bars) ──
   const miniBars = document.getElementById('mini-bars');
   if (miniBars) {
@@ -536,58 +466,22 @@ function updateDashboard() {
   if (subgroupBars) {
     subgroupBars.innerHTML = '';
 
-    const subgroupMap = {};
-    data.forEach(d => {
-      const subgroups = Array.isArray(d.subgrupos)
-        ? d.subgrupos
-        : (d.subgrupo ? [d.subgrupo] : []);
-      const atendente = d.atendente || 'Sem atendente';
+    const totalSub = Object.values(subgroupCounts).reduce((sum, value) => sum + value, 0) || 1;
+    const subgroupKeys = Object.keys(subgroupCounts);
 
-      subgroups.forEach(sub => {
-        if (!sub) return;
-        if (!subgroupMap[sub]) subgroupMap[sub] = {};
-        subgroupMap[sub][atendente] = (subgroupMap[sub][atendente] || 0) + 1;
-      });
-    });
-
-    const sortedSubgroups = Object.entries(subgroupMap)
-      .map(([label, attendants]) => ({
-        label,
-        totalCount: Object.values(attendants).reduce((sum, count) => sum + count, 0),
-        attendants
-      }))
-      .sort((a, b) => b.totalCount - a.totalCount);
-
-    if (sortedSubgroups.length === 0) {
+    if (subgroupKeys.length === 0) {
       subgroupBars.innerHTML = '<div class="empty-state">Nenhuma distribuição por subgrupo disponível.</div>';
     } else {
-      sortedSubgroups.forEach(({ label, totalCount, attendants }) => {
-        const sortedAttendants = Object.entries(attendants).sort((a, b) => b[1] - a[1]);
-
+      subgroupKeys.forEach((sub) => {
+        const count = subgroupCounts[sub];
+        const percent = ((count / totalSub) * 100).toFixed(1);
         subgroupBars.innerHTML += `
           <div class="bar-row">
-            <div class="bar-label" style="width: 120px; font-size: 0.75rem;">${label}</div>
-            <div class="bar-track" style="flex: 1; height: 10px; background: var(--border); border-radius: 50px; overflow: hidden; display: flex; align-items: stretch;">
-              ${sortedAttendants.map(([att, count], index) => {
-                const attIndex = ATENDENTES.indexOf(att);
-                const color = CORES_GRAFICOS[(attIndex >= 0 ? attIndex : index) % CORES_GRAFICOS.length];
-                const segmentPercent = ((count / totalCount) * 100).toFixed(1);
-                const isFirst = index === 0;
-                const isLast = index === sortedAttendants.length - 1;
-                return `<div class="bar-fill" style="width: ${segmentPercent}%; background-color: ${color}; height: 100%; border-radius: ${isFirst ? '50px 0 0 50px' : isLast ? '0 50px 50px 0' : '0'};"></div>`;
-              }).join('')}
+            <div class="bar-label" style="width: 120px; font-size: 0.78rem;">${sub}</div>
+            <div class="bar-track" style="flex: 1; height: 10px; background: var(--border); border-radius: 50px; overflow: hidden;">
+              <div class="bar-fill" style="width: ${percent}%; background-color: var(--bom); height: 100%;"></div>
             </div>
-            <div class="bar-count" style="width: 48px; font-size: 0.72rem; text-align: right; color: var(--muted);">${totalCount}</div>
-          </div>
-          <div style="margin: -6px 0 12px 130px; display: flex; flex-wrap: wrap; gap: 8px; font-size: 0.72rem; color: var(--muted);">
-            ${sortedAttendants.map(([att, count], index) => {
-              const attIndex = ATENDENTES.indexOf(att);
-              const color = CORES_GRAFICOS[(attIndex >= 0 ? attIndex : index) % CORES_GRAFICOS.length];
-              return `<span style="display: flex; align-items: center; gap: 4px;">
-                <span style="width: 10px; height: 10px; border-radius: 999px; background: ${color}; display: inline-block;"></span>
-                ${att} (${count})
-              </span>`;
-            }).join('')}
+            <div class="bar-count" style="width: 48px; font-size: 0.75rem; text-align: right; color: var(--muted);">${count} (${percent}%)</div>
           </div>
         `;
       });
@@ -684,7 +578,9 @@ function showAttendantDetails(att, cor) {
           <span style="font-weight: bold; color: var(--text)">${avaliadorText}</span>
           <span style="font-weight: bold; color: #58a6ff;">${avaliacaoText} (Peso: ${pesoValue})</span>
         </div>
-        <!-- Comentário removido do formulário; não exibir mais -->
+        <p style="font-size: 0.8rem; color: var(--text); font-style: italic;">
+          "${d.feedback || 'Sem comentários adicionais.'}"
+        </p>
         <span style="font-size: 0.65rem; color: var(--muted); display: block; text-align: right; margin-top: 4px;">
           ${dataText} ${horaText ? 'às ' + horaText : ''}
         </span>
@@ -726,7 +622,7 @@ function renderPreview() {
           <th>Atendente</th>
           <th>Avaliação</th>
           <th>Peso</th>
-          <th>Subgrupos</th>
+          <th>Feedback</th>
           <th>Data</th>
           <th>Hora</th>
         </tr>
@@ -757,10 +653,6 @@ function renderPreview() {
     // (caso o timestamp não tenha sido usado para preencher).
     if (!finalId) finalId = String(Date.now() - i);
 
-    const subgroupText = Array.isArray(d.subgrupos)
-      ? d.subgrupos.join(', ')
-      : (d.subgrupo || '');
-
     tableHtml += `
       <tr>
         <td>${finalId}</td>
@@ -768,7 +660,7 @@ function renderPreview() {
         <td>${d.atendente || ''}</td>
         <td>${d.avaliacao || ''}</td>
         <td>${pesoValue}</td>
-        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${subgroupText}</td>
+        <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${d.feedback || ''}</td>
         <td>${dataText}</td>
         <td>${horaText}</td>
       </tr>
@@ -788,7 +680,7 @@ function exportCSV() {
   // O "sep=;" na 1ª linha instrui o Excel explicitamente — mas aqui usamos
   // uma abordagem melhor: salvar como .txt com extensão .csv e sep no início
   const SEP = ';';
-  const headers = ['ID', 'Avaliador', 'Atendente', 'Avaliacao', 'Peso', 'Subgrupos', 'Data', 'Hora', 'Mes', 'Ano'];
+  const headers = ['ID', 'Avaliador', 'Atendente', 'Avaliacao', 'Peso', 'Feedback', 'Data', 'Hora', 'Mes', 'Ano'];
 
   // "sep=;" como 1ª linha funciona APENAS quando o arquivo não tem BOM.
   // Com BOM, o Excel lê o encoding correto. Então usamos BOM + sem sep=.
@@ -799,8 +691,8 @@ function exportCSV() {
   // separadores, aspas ou quebras de linha (padrão CSV RFC 4180).
   const escapar = (str) => {
     const s = String(str == null ? '' : str);
-    // Se contém ; ou , ou " ou quebra de linha, envolve em aspas
-    if (s.includes(SEP) || s.includes(',') || s.includes('"') || s.includes('\n')) {
+    // Se contém ; ou " ou quebra de linha, envolve em aspas
+    if (s.includes(SEP) || s.includes('"') || s.includes('\n')) {
       return '"' + s.replace(/"/g, '""') + '"';
     }
     return s;
@@ -844,17 +736,13 @@ function exportCSV() {
     // que datas causem formatação automática indesejada.
     const texto = (str) => `="${String(str == null ? '' : str).replace(/"/g, '""')}"`;
 
-    const subgroupText = Array.isArray(d.subgrupos)
-      ? d.subgrupos.join(', ')
-      : (d.subgrupo || '');
-
     const row = [
       texto(finalId),                        // ID — sem notação científica e sem aspas no Excel para garantir compatibilidade com Power BI (que lê o número puro)
       escapar(d.avaliador || 'Anônimo'),
       escapar(d.atendente || ''),
       escapar(d.avaliacao || ''),
       pesoValue,                            // Peso — número, sem aspas (para cálculos no BI) 
-      escapar(subgroupText),
+      escapar(d.feedback || ''),
       texto(dataText),                       // Data — sem conversão automática do Excel — evita ########
       texto(horaText),                        // Hora — sem conversão automática do Excel
       escapar(mes),                          // Mês (01-12) — para filtros no Power BI
@@ -897,27 +785,3 @@ function exportJSON() {
   a.click();
   URL.revokeObjectURL(url); // Libera a memória após o download
 }
-
-// Expõe as funções globais quando o arquivo for carregado como módulo.
-window.ATENDENTES = ATENDENTES;
-window.initAvaliador = initAvaliador;
-window.selectRating = selectRating;
-window.renderSubgroupOptions = typeof renderSubgroupOptions !== 'undefined' ? renderSubgroupOptions : undefined;
-window.toggleSubgroup = typeof toggleSubgroup !== 'undefined' ? toggleSubgroup : undefined;
-window.validateAvaliador = validateAvaliador;
-window.checkSubmit = checkSubmit;
-window.submitRating = submitRating;
-window.openPwdModal = openPwdModal;
-window.closePwdModal = closePwdModal;
-window.togglePwd = togglePwd;
-window.confirmPwd = confirmPwd;
-
-window.initProgramador = initProgramador;
-window.switchTab = switchTab;
-window.switchDashView = switchDashView;
-window.updateDashboard = updateDashboard;
-window.buildAttChips = buildAttChips;
-window.showAttendantDetails = showAttendantDetails;
-window.renderPreview = renderPreview;
-window.exportCSV = exportCSV;
-window.exportJSON = exportJSON;

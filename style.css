@@ -215,6 +215,25 @@ body {
   margin: 14px 0 8px;
 }
 
+/* ══════════════════════════════════════════
+   SUBGRUPOS (chips clicáveis)
+   ══════════════════════════════════════════ */
+.subgroup-wrap { margin: 10px 0 18px; }
+.subgroup-container { display: flex; flex-wrap: wrap; gap: 8px; }
+.subgroup-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+.subgroup-chip:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.06); }
+.subgroup-chip.selected { background: var(--teal); color: #fff; border-color: transparent; box-shadow: 0 6px 18px rgba(0,168,150,0.12); }
+
 /* ── Campo de nome do avaliador ── */
 
 /* position: relative no wrapper permite posicionar o ícone

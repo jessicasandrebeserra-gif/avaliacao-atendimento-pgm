@@ -90,22 +90,16 @@
       </div>
 
       <!-- ── SEÇÃO 4: Comentário opcional ── -->
-      <p class="section-label">Comentário opcional</p>
-      <div class="feedback-wrap">
-        <!-- maxlength="300" limita no nível do HTML.
-             oninput="updateCounter(this)" atualiza o contador em tempo real.
-             "this" passa a referência ao próprio textarea para a função. -->
-        <textarea id="feedback-box" class="feedback-box" placeholder="Deixe seu comentário, elogio ou crítica…"
-          maxlength="300" oninput="updateCounter(this)"></textarea>
-
-        <!-- Contador de caracteres. Atualizado via JS pela função updateCounter(). -->
-        <div class="feedback-counter" id="feedback-counter">0 / 300</div>
+      <p class="section-label">Subgrupos</p>
+      <div class="subgroup-wrap">
+        <div id="subgroup-container" class="subgroup-container"></div>
+        <input type="hidden" id="subgroup-input" />
       </div>
 
-      <!-- ── BOTÃO DE ENVIO ──
-           Começa desabilitado (disabled).
-           Só é habilitado via JS quando nome, atendente e nota estão preenchidos.
-           onclick chama submitRating() que salva a avaliação e limpa o formulário. -->
+       <!-- ── BOTÃO DE ENVIO ──
+         Começa desabilitado (disabled).
+         Só é habilitado via JS quando nome, atendente e nota estão preenchidos.
+         onclick chama submitRating() que salva a avaliação e limpa o formulário. -->
       <button class="submit-btn" id="submit-btn" onclick="submitRating()" disabled>Enviar Avaliação</button>
     </div>
   </main>
