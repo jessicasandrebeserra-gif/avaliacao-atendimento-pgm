@@ -124,6 +124,20 @@
            Oculta por padrão; exibida ao clicar na sub-aba "👤 Por Atendente".
            Mostra chips clicáveis e, ao selecionar um, exibe detalhes daquele atendente. -->
       <div class="dash-view" id="dash-atendente">
+        <div class="attendant-manager">
+          <div class="manager-field">
+            <label for="new-attendant-input">Adicionar atendente</label>
+            <input type="text" id="new-attendant-input" placeholder="Nome do atendente" />
+          </div>
+          <button class="manager-btn add" onclick="addAttendant()">Adicionar</button>
+
+          <div class="manager-field">
+            <label for="remove-attendant-select">Excluir atendente</label>
+            <select id="remove-attendant-select"></select>
+          </div>
+          <button class="manager-btn remove" onclick="removeAttendant()">Excluir</button>
+        </div>
+
         <p class="section-label">Selecione o atendente</p>
         <!-- Container dos chips (botões compactos) de cada atendente.
              Preenchido dinamicamente por buildAttChips() em app.js. -->

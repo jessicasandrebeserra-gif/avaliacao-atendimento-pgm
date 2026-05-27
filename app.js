@@ -15,10 +15,12 @@
 
 // Lista com os nomes dos atendentes que aparecerão no formulário de avaliação.
 // Para adicionar ou remover atendentes, basta editar este array.
-const ATENDENTES = [
+const DEFAULT_ATENDENTES = [
   "Alexandre", "Jamille", "Fatima",
   "Eduardo", "Jossânia", "Aparecida"
 ];
+
+let ATENDENTES = loadAttendants();
 
 // Hash SHA-256 da senha do programador.
 // Nunca salvamos a senha em texto puro — apenas seu hash.
@@ -29,7 +31,7 @@ const HASH_SENHA = '083e9e06537510eba266871443c9448e480edf649aaf265efc02eef63f1d
 const PESOS = { 'Ótimo': 5, 'Bom': 4, 'Médio': 2, 'Ruim': 1 };
 // Paleta de cores usada nos gráficos de barras do dashboard.
 // Cada atendente recebe uma cor diferente, ciclando pelo array se necessário.
-const CORES_GRAFICOS = ['#58a6ff', '#bc8cff', '#f57dd1', '#56d364', '#ffa657', '#eaf04d'];
+const CORES_GRAFICOS = ['var(--teal)', 'var(--orange)', 'var(--muted)'];
 
 // Variáveis de estado que guardam temporariamente o atendente e a nota
 // selecionados pelo avaliador antes de enviar o formulário.
@@ -62,6 +64,22 @@ function loadData() {
 // que pode ser armazenada no localStorage (só aceita texto).
 function saveData(data) {
   localStorage.setItem('avaliacoes', JSON.stringify(data));
+}
+
+function loadAttendants() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('atendentes') || 'null');
+    if (Array.isArray(saved)) {
+      return saved.filter(Boolean);
+    }
+  } catch (e) {
+    console.error("Erro ao ler atendentes:", e);
+  }
+  return [...DEFAULT_ATENDENTES];
+}
+
+function saveAttendants() {
+  localStorage.setItem('atendentes', JSON.stringify(ATENDENTES));
 }
 
 
@@ -383,6 +401,7 @@ function submitRating() {
 // Executada ao carregar programador.html.
 // Inicializa o dashboard na view padrão "geral".
 function initProgramador() {
+  renderAttendantManager();
   updateDashboard();
   switchDashView('geral');
 }
@@ -430,6 +449,7 @@ function switchDashView(view) {
   } else if (view === 'atendente') {
     if (tabAtendente) tabAtendente.classList.add('active');
     if (viewAtendente) viewAtendente.classList.add('active');
+    renderAttendantManager();
     buildAttChips(); // Constrói os chips clicáveis de atendentes
   }
 }
@@ -437,6 +457,89 @@ function switchDashView(view) {
 // Lê todos os dados e atualiza o dashboard completo:
 // contadores de notas, gráfico de volume por atendente e
 // gráfico de distribuição geral.
+function renderAttendantManager() {
+  const select = document.getElementById('remove-attendant-select');
+  if (!select) return;
+
+  select.innerHTML = '';
+  if (!ATENDENTES.length) {
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'Nenhum atendente cadastrado';
+    select.appendChild(option);
+    return;
+  }
+
+  ATENDENTES.forEach(att => {
+    const option = document.createElement('option');
+    option.value = att;
+    option.textContent = att;
+    select.appendChild(option);
+  });
+}
+
+function refreshAttendantViews() {
+  saveAttendants();
+  window.ATENDENTES = ATENDENTES;
+  renderAttendantManager();
+  buildAttChips();
+  updateDashboard();
+
+  if (typeof initAvaliador === 'function') {
+    initAvaliador();
+  }
+}
+
+function addAttendant() {
+  const input = document.getElementById('new-attendant-input');
+  if (!input) return;
+
+  const name = input.value.trim().replace(/\s+/g, ' ');
+  if (!name) {
+    alert('Informe o nome do atendente.');
+    return;
+  }
+
+  const alreadyExists = ATENDENTES.some(att => att.toLowerCase() === name.toLowerCase());
+  if (alreadyExists) {
+    alert('Este atendente já está cadastrado.');
+    return;
+  }
+
+  ATENDENTES.push(name);
+  input.value = '';
+  refreshAttendantViews();
+}
+
+function removeAttendant() {
+  const select = document.getElementById('remove-attendant-select');
+  if (!select || !select.value) {
+    alert('Selecione um atendente para excluir.');
+    return;
+  }
+
+  const name = select.value;
+  const hasRatings = loadData().some(d => d.atendente === name);
+  if (hasRatings && !confirm(`Excluir ${name} da lista de atendentes? As avaliações já registradas serão mantidas nos relatórios.`)) {
+    return;
+  }
+
+  ATENDENTES = ATENDENTES.filter(att => att !== name);
+  if (selectedAttendant === name) selectedAttendant = null;
+
+  const detailArea = document.getElementById('att-detail-area');
+  if (detailArea) {
+    detailArea.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">👆</div>
+        Toque em um atendente acima para ver o detalhamento das notas e comentários.
+      </div>
+    `;
+  }
+
+  refreshAttendantViews();
+}
+
 function updateDashboard() {
   const data = loadData();
   // Atualiza o badge com o total de avaliações no cabeçalho
@@ -604,6 +707,11 @@ function buildAttChips() {
 
   container.innerHTML = ''; // Limpa antes de reconstruir
   const data = loadData();
+
+  if (!ATENDENTES.length) {
+    container.innerHTML = '<div class="empty-state">Nenhum atendente cadastrado.</div>';
+    return;
+  }
 
   ATENDENTES.forEach((att, index) => {
     // Conta quantas avaliações este atendente específico recebeu
@@ -915,6 +1023,8 @@ window.confirmPwd = confirmPwd;
 window.initProgramador = initProgramador;
 window.switchTab = switchTab;
 window.switchDashView = switchDashView;
+window.addAttendant = addAttendant;
+window.removeAttendant = removeAttendant;
 window.updateDashboard = updateDashboard;
 window.buildAttChips = buildAttChips;
 window.showAttendantDetails = showAttendantDetails;

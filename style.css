@@ -612,6 +612,74 @@ body {
 
 .bar-count { width: 30px; font-size: 0.78rem; text-align: right; color: var(--muted); }
 
+/* Gerenciamento de atendentes */
+.attendant-manager {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.manager-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.manager-field label {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.manager-field input,
+.manager-field select {
+  width: 100%;
+  min-height: 40px;
+  background: #FFFFFF;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font: 0.88rem 'DM Sans', sans-serif;
+  padding: 9px 10px;
+  outline: none;
+}
+
+.manager-field input:focus,
+.manager-field select:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px var(--teal-light);
+}
+
+.manager-btn {
+  min-height: 40px;
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 0 16px;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.manager-btn:hover { transform: translateY(-1px); }
+.manager-btn.add { background: var(--teal); }
+.manager-btn.add:hover { background: var(--teal-dark); }
+.manager-btn.remove { background: var(--orange); }
+.manager-btn.remove:hover { background: var(--orange-dark); }
+
 /* ── Chips de atendente (sub-aba "Por Atendente") ──
    Botões em formato de pílula, um por atendente.
    A borda esquerda colorida é aplicada via JS. */
@@ -764,3 +832,54 @@ body {
 
 /* Linha com fundo levemente alaranjado ao passar o mouse — facilita a leitura */
 .preview-table tr:hover td { background: #FDF4EC; }
+
+@media (max-width: 760px) {
+  .screen-container { padding: 16px 14px 48px; }
+
+  .app-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .header-right {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .badge { margin-right: 0; }
+
+  .attendant-manager {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .manager-btn { width: 100%; }
+
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+
+  .attendant-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .rating-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .bar-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .bar-label,
+  .bar-count {
+    width: auto !important;
+    text-align: left !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .dash-subtabs { flex-direction: column; }
+  .stats-row,
+  .attendant-grid,
+  .rating-grid { grid-template-columns: 1fr; }
+}
