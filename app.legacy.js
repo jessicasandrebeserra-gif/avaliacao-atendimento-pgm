@@ -730,21 +730,15 @@ function exportCSV() {
       }
     }
 
-    // A função texto() usa a fórmula ="valor" do Excel.
-    // Isso força o Excel a interpretar o conteúdo como texto puro,
-    // evitando que IDs virem notação científica (1,78E+12) e
-    // que datas causem formatação automática indesejada.
-    const texto = (str) => `="${String(str == null ? '' : str).replace(/"/g, '""')}"`;
-
     const row = [
-      texto(finalId),                        // ID — sem notação científica e sem aspas no Excel para garantir compatibilidade com Power BI (que lê o número puro)
+      escapar(finalId),                     // ID — como texto normal para evitar notação científica e sem fórmula
       escapar(d.avaliador || 'Anônimo'),
       escapar(d.atendente || ''),
       escapar(d.avaliacao || ''),
-      pesoValue,                            // Peso — número, sem aspas (para cálculos no BI) 
+      pesoValue,                            // Peso — número, sem aspas (para cálculos no BI)
       escapar(d.feedback || ''),
-      texto(dataText),                       // Data — sem conversão automática do Excel — evita ########
-      texto(horaText),                        // Hora — sem conversão automática do Excel
+      escapar(dataText),                    // Data — texto simples, sem fórmula
+      escapar(horaText),                    // Hora — texto simples, sem fórmula
       escapar(mes),                          // Mês (01-12) — para filtros no Power BI
       escapar(ano)                           // Ano (ex: 2026) — para filtros no Power BI
     ];
