@@ -50,12 +50,56 @@ let selectedRating = null;
 // JSON.parse converte a string JSON de volta para um array de objetos.
 // Se não houver nada salvo, retorna um array vazio [].
 // O try/catch evita que um erro de leitura quebre o sistema.
-function loadData() {
+function loadLocalData() {
   try {
     return JSON.parse(localStorage.getItem('avaliacoes') || '[]');
   } catch (e) {
     console.error("Erro ao ler localStorage:", e);
     return [];
+  }
+}
+
+function loadData() {
+  return loadLocalData();
+}
+
+const API_ORIGIN = window.location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
+
+async function fetchServerData() {
+  try {
+    const response = await fetch(`${API_ORIGIN}/avaliacoes`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      saveData(data);
+      return data;
+    }
+  } catch (error) {
+    console.warn("Falha ao carregar dados do servidor:", error);
+  }
+
+  return loadLocalData();
+}
+
+async function saveRatingToServer(avaliacao) {
+  try {
+    const response = await fetch(`${API_ORIGIN}/salvar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(avaliacao)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.warn("Falha ao salvar no servidor:", error);
+    throw error;
   }
 }
 
@@ -329,12 +373,10 @@ function toggleSubgroup(el) {
 
 // Coleta os dados do formulário, cria um objeto de avaliação,
 // salva no localStorage, limpa o formulário e exibe o toast de confirmação.
-function submitRating() {
+async function submitRating() {
   const data = loadData();
   const avaliadorInput = document.getElementById('avaliador-input');
   const agora = new Date(); // Captura data e hora no momento do envio
-  // Monta o objeto com todos os dados da avaliação.
-  // O id usa Date.now() (milissegundos desde 1970) para ser único.
   const subgroups = getSelectedSubgroups();
   const novaAvaliacao = {
     id: Date.now(),
@@ -342,7 +384,6 @@ function submitRating() {
     atendente: selectedAttendant,
     avaliacao: selectedRating,
     peso: PESOS[selectedRating] || 0, // Busca o peso numérico da nota
-    // campo de comentário removido
     subgrupos: subgroups,
     subgrupo: subgroups[0] || '',
     data: agora.toLocaleDateString('pt-BR'), // Ex: "09/05/2026" no formato brasileiro
@@ -353,11 +394,16 @@ function submitRating() {
   data.push(novaAvaliacao); // Adiciona a nova avaliação ao array
   saveData(data); // Salva o array atualizado no localStorage
 
+  try {
+    await saveRatingToServer(novaAvaliacao);
+  } catch (error) {
+    // Se o servidor estiver indisponível, os dados continuam salvos localmente.
+  }
+
   // ── Limpa o formulário para uma nova avaliação ──
   selectedAttendant = null;
   selectedRating = null;
   avaliadorInput.value = '';
-  // campo de comentário removido anteriormente — não existe mais
 
   // Coloca o foco no campo de nome para facilitar novo envio
   avaliadorInput.focus();
@@ -367,8 +413,6 @@ function submitRating() {
   if (subgroupContainer) subgroupContainer.innerHTML = '';
   const subgroupInput = document.getElementById('subgroup-input');
   if (subgroupInput) subgroupInput.value = '';
-
-  // comentário removido — nada para resetar
 
   // Remove a seleção visual dos cards de atendente e dos botões de nota
   document.querySelectorAll('.attendant-card').forEach(c => c.classList.remove('selected'));
@@ -400,7 +444,8 @@ function submitRating() {
 
 // Executada ao carregar programador.html.
 // Inicializa o dashboard na view padrão "geral".
-function initProgramador() {
+async function initProgramador() {
+  await fetchServerData();
   renderAttendantManager();
   updateDashboard();
   switchDashView('geral');

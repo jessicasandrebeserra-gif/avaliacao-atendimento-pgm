@@ -52,16 +52,49 @@ avaliacao-atendimento-pgm/
 
 ## 🚀 Como usar
 
-Por ser um projeto frontend puro, não requer instalação de dependências.
+Este projeto pode ser executado de duas maneiras:
+
+- Sem servidor: abra `index.html` diretamente no navegador. Os dados são salvos apenas em `localStorage`.
+- Com servidor Python: use o backend Flask para persistir as avaliações no banco de dados SQLite.
 
 1. Clone o repositório:
 ```bash
 git clone https://github.com/seu-usuario/avaliacao-atendimento-pgm.git
 ```
 
-2. Abra a pasta no VSCode e inicie com o **Live Server**
+2. Entre na pasta do projeto:
+```bash
+cd avaliacao-atendimento-pgm
+```
 
-3. Acesse `index.html` no navegador
+3. Crie e ative um ambiente virtual (recomendado):
+```bash
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+4. Instale as dependências:
+```bash
+python -m pip install -r requirements.txt
+```
+
+5. Inicie o servidor:
+```bash
+python server.py
+```
+
+6. Abra no navegador:
+```text
+http://127.0.0.1:5000/
+```
+
+---
+
+## 💾 Armazenamento de Dados
+
+Quando o projeto estiver rodando pelo servidor Python, as avaliações são armazenadas em `avaliacao.db` usando SQLite.
+
+Se a aplicação for aberta diretamente como arquivo local (`index.html`), ela utiliza `localStorage` como fallback e o banco de dados SQLite não será atualizado.
 
 ---
 
