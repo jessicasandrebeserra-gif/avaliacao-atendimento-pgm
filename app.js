@@ -63,7 +63,12 @@ function loadData() {
   return loadLocalData();
 }
 
-const API_ORIGIN = window.location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
+const API_ORIGIN = (() => {
+  const isFileProtocol = window.location.protocol === 'file:';
+  const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const isLocalDevServer = isLocalhost && window.location.port !== '5000';
+  return isFileProtocol || isLocalDevServer ? 'http://127.0.0.1:5000' : '';
+})();
 
 async function fetchServerData() {
   try {
@@ -98,7 +103,7 @@ async function saveRatingToServer(avaliacao) {
 
     return await response.json();
   } catch (error) {
-    console.warn("Falha ao salvar no servidor:", error);
+    console.warn("Falha ao salvar avaliação no servidor:", error, "API_ORIGIN=", API_ORIGIN);
     throw error;
   }
 }
