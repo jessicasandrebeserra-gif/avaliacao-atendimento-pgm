@@ -35,8 +35,10 @@ const CORES_GRAFICOS = ['var(--teal)', 'var(--orange)', 'var(--muted)'];
 
 // Variáveis de estado que guardam temporariamente o atendente e a nota
 // selecionados pelo avaliador antes de enviar o formulário.
+const PROGRAMADOR_AUTH_KEY = 'programadorUnlocked';
 let selectedAttendant = null;
 let selectedRating = null;
+let programadorUnlocked = sessionStorage.getItem(PROGRAMADOR_AUTH_KEY) === 'true';
 
 /* ==========================================
    PERSISTÊNCIA DE DADOS (localStorage)
@@ -63,12 +65,7 @@ function loadData() {
   return loadLocalData();
 }
 
-const API_ORIGIN = (() => {
-  const isFileProtocol = window.location.protocol === 'file:';
-  const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-  const isLocalDevServer = isLocalhost && window.location.port !== '5000';
-  return isFileProtocol || isLocalDevServer ? 'http://127.0.0.1:5000' : '';
-})();
+const API_ORIGIN = 'http://172.30.49.92:5000';
 
 async function fetchServerData() {
   try {
@@ -93,7 +90,9 @@ async function saveRatingToServer(avaliacao) {
   try {
     const response = await fetch(`${API_ORIGIN}/salvar`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(avaliacao)
     });
 
@@ -103,7 +102,7 @@ async function saveRatingToServer(avaliacao) {
 
     return await response.json();
   } catch (error) {
-    console.warn("Falha ao salvar avaliação no servidor:", error, "API_ORIGIN=", API_ORIGIN);
+    console.warn("Falha ao salvar avaliação no servidor:", error);
     throw error;
   }
 }
@@ -192,11 +191,30 @@ async function confirmPwd() {
   // Compara o hash gerado com o hash da senha correta (definido no topo do arquivo).
   if (hashHex === HASH_SENHA) {
     closePwdModal();
-    window.location.href = 'programador.html';  // Redireciona para o painel
+    sessionStorage.setItem(PROGRAMADOR_AUTH_KEY, 'true');
+    programadorUnlocked = true;
+    const currentPage = window.location.pathname.split('/').pop().toLowerCase();
+    if (currentPage === 'programador.html') {
+      if (typeof initProgramador === 'function') {
+        initProgramador();
+      }
+    } else {
+      window.location.href = 'programador.html';  // Redireciona para o painel
+    }
   } else {
     // Exibe mensagem de erro e limpa o campo para nova tentativa.
     document.getElementById('pwd-error').textContent = 'Senha incorreta. Tente novamente.';
     document.getElementById('pwd-input').value = '';
+  }
+}
+
+function requireProgramadorAccess() {
+  if (programadorUnlocked) {
+    if (typeof initProgramador === 'function') {
+      initProgramador();
+    }
+  } else {
+    openPwdModal();
   }
 }
 
@@ -339,7 +357,7 @@ function renderSubgroupOptions(nota) {
       'Não resolveu o problema',
       'Falta de educação',
       'Informações erradas',
-      'Necessita melhoria e excluir o comentario'
+      'Necessita melhoria'
     ]
   };
 
@@ -1063,6 +1081,7 @@ window.openPwdModal = openPwdModal;
 window.closePwdModal = closePwdModal;
 window.togglePwd = togglePwd;
 window.confirmPwd = confirmPwd;
+window.requireProgramadorAccess = requireProgramadorAccess;
 
 window.initProgramador = initProgramador;
 window.switchTab = switchTab;

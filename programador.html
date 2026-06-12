@@ -190,13 +190,35 @@
     <!-- /screen-exportar -->
 
   </main>
+
+  <!-- ══════════════════════════════════════════
+       MODAL DE SENHA (pwd-modal)
+       ══════════════════════════════════════════ -->
+  <div id="pwd-modal">
+    <div class="pwd-box">
+      <h2>🔒 Acesso Programador</h2>
+      <p>Digite a senha para acessar o painel completo.</p>
+      <div class="pwd-input-wrap">
+        <input type="password" id="pwd-input" class="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') confirmPwd()" />
+        <span class="pwd-toggle" onclick="togglePwd()">👁</span>
+      </div>
+      <div class="pwd-error" id="pwd-error"></div>
+      <div class="pwd-actions">
+        <button class="pwd-cancel" onclick="closePwdModal()">Cancelar</button>
+        <button class="pwd-confirm" onclick="confirmPwd()">Entrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Script principal — carregado ao final para garantir que todos os elementos HTML já existam no DOM antes de o JavaScript tentar manipulá-los -->
   <script src="./app.js"></script>
 
   <!-- Inicializa o painel assim que a página carregar -->
   <script>
     window.addEventListener('load', function () {
-      if (typeof window.initProgramador === 'function') {
+      if (typeof window.requireProgramadorAccess === 'function') {
+        window.requireProgramadorAccess();
+      } else if (typeof window.initProgramador === 'function') {
         window.initProgramador();
       } else {
         console.warn('Não foi possível inicializar o painel do programador: função initProgramador não encontrada.');

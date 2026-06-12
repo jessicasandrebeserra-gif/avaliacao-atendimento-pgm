@@ -60,6 +60,7 @@ def listar_avaliacoes():
         rows = cursor.fetchall()
 
     avaliacoes = []
+
     for row in rows:
         try:
             subgrupos = json.loads(row['subgrupos']) if row['subgrupos'] else []
@@ -82,10 +83,15 @@ def listar_avaliacoes():
     return jsonify(avaliacoes)
 
 
-@app.route('/salvar', methods=['POST'])
+@app.route('/salvar', methods=['POST', 'OPTIONS'])
 def salvar():
+    if request.method == 'OPTIONS':
+        return jsonify({'status': 'ok'}), 200
+
     dados = request.get_json(force=True)
+
     subgrupos = dados.get('subgrupos') or []
+
     if not isinstance(subgrupos, list):
         subgrupos = [str(subgrupos)]
 
@@ -93,7 +99,17 @@ def salvar():
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO avaliacoes
-            (avaliador, atendente, avaliacao, peso, subgrupos, subgrupo, data, hora, timestamp)
+            (
+                avaliador,
+                atendente,
+                avaliacao,
+                peso,
+                subgrupos,
+                subgrupo,
+                data,
+                hora,
+                timestamp
+            )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             dados.get('avaliador'),
@@ -106,11 +122,15 @@ def salvar():
             dados.get('hora'),
             dados.get('timestamp')
         ))
+
         novo_id = cursor.lastrowid
         conn.commit()
 
-    return jsonify({"mensagem": "Salvo com sucesso", "id": novo_id})
+    return jsonify({
+        'mensagem': 'Salvo com sucesso',
+        'id': novo_id
+    }), 201
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
