@@ -2,12 +2,19 @@ from flask import Flask, request, jsonify
 import sqlite3
 import json
 import os
+import hashlib
 
 app = Flask(__name__, static_url_path='', static_folder='.')
 app.config['JSON_AS_ASCII'] = False
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DB_PATH = os.path.join(BASE_DIR, 'avaliacao.db')
+
+# Hash SHA-256 da senha atual do programador.
+# A senha não fica exposta no JavaScript nem é enviada de volta ao navegador.
+HASH_SENHA_PROGRAMADOR = (
+    '083e9e06537510eba266871443c9448e480edf649aaf265efc02eef63f1df216'
+)
 
 
 def get_connection():
@@ -50,6 +57,30 @@ def add_cors_headers(response):
 @app.route('/')
 def home():
     return app.send_static_file('index.html')
+
+
+@app.route('/login-programador', methods=['POST', 'OPTIONS'])
+def login_programador():
+    if request.method == 'OPTIONS':
+        return jsonify({'status': 'ok'}), 200
+
+    dados = request.get_json(silent=True) or {}
+    senha = str(dados.get('senha', ''))
+
+    hash_digitado = hashlib.sha256(
+        senha.encode('utf-8')
+    ).hexdigest()
+
+    if hash_digitado == HASH_SENHA_PROGRAMADOR:
+        return jsonify({
+            'autorizado': True,
+            'mensagem': 'Acesso autorizado'
+        }), 200
+
+    return jsonify({
+        'autorizado': False,
+        'mensagem': 'Senha incorreta. Tente novamente.'
+    }), 401
 
 
 @app.route('/avaliacoes', methods=['GET'])
@@ -133,4 +164,4 @@ def salvar():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

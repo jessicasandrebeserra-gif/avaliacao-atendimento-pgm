@@ -22,10 +22,7 @@ const DEFAULT_ATENDENTES = [
 
 let ATENDENTES = loadAttendants();
 
-// Hash SHA-256 da senha do programador.
-// Nunca salvamos a senha em texto puro — apenas seu hash.
-// Se quiser trocar a senha, gere um novo hash SHA-256 e substitua aqui.
-const HASH_SENHA = '083e9e06537510eba266871443c9448e480edf649aaf265efc02eef63f1df216';
+// A senha do programador agora é validada no servidor Flask.
 // Pesos numéricos de cada nota, usados para calcular a média de desempenho.
 // Ex: "Ótimo" vale 5, "Bom" vale 4, etc.
 const PESOS = { 'Ótimo': 5, 'Bom': 4, 'Médio': 2, 'Ruim': 1 };
@@ -65,7 +62,7 @@ function loadData() {
   return loadLocalData();
 }
 
-const API_ORIGIN = 'http://172.30.49.92:5000';
+const API_ORIGIN = window.location.origin;
 
 async function fetchServerData() {
   try {
@@ -172,39 +169,62 @@ function togglePwd() {
 // Verifica a senha digitada de forma segura usando criptografia no navegador.
 // async/await é necessário pois crypto.subtle.digest é uma operação assíncrona.
 async function confirmPwd() {
-  const inputVal = document.getElementById('pwd-input').value;
+  const input = document.getElementById('pwd-input');
+  const error = document.getElementById('pwd-error');
 
-  // TextEncoder converte a string da senha em bytes (Uint8Array),
-  // que é o formato que a API de criptografia espera.
-  const encoder = new TextEncoder();
-  const data = encoder.encode(inputVal);
-  // crypto.subtle.digest gera o hash SHA-256 dos bytes da senha.
-  // Isso retorna um ArrayBuffer (bloco de bytes brutos).
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  if (!input) {
+    console.error('Campo de senha não encontrado.');
+    return;
+  }
 
-  // Converte o ArrayBuffer em um array comum de números (0-255).
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const senha = input.value;
 
-  // Converte cada número para hexadecimal de 2 dígitos e junta tudo em uma string.
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  if (!senha) {
+    if (error) error.textContent = 'Digite a senha.';
+    input.focus();
+    return;
+  }
 
-  // Compara o hash gerado com o hash da senha correta (definido no topo do arquivo).
-  if (hashHex === HASH_SENHA) {
-    closePwdModal();
-    sessionStorage.setItem(PROGRAMADOR_AUTH_KEY, 'true');
-    programadorUnlocked = true;
-    const currentPage = window.location.pathname.split('/').pop().toLowerCase();
-    if (currentPage === 'programador.html') {
-      if (typeof initProgramador === 'function') {
-        initProgramador();
+  try {
+    const response = await fetch(`${API_ORIGIN}/login-programador`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ senha })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.autorizado) {
+      closePwdModal();
+      sessionStorage.setItem(PROGRAMADOR_AUTH_KEY, 'true');
+      programadorUnlocked = true;
+
+      const currentPage = window.location.pathname
+        .split('/')
+        .pop()
+        .toLowerCase();
+
+      if (currentPage === 'programador.html') {
+        if (typeof initProgramador === 'function') {
+          initProgramador();
+        }
+      } else {
+        window.location.href = 'programador.html';
       }
     } else {
-      window.location.href = 'programador.html';  // Redireciona para o painel
+      if (error) {
+        error.textContent = result.mensagem || 'Senha incorreta. Tente novamente.';
+      }
+      input.value = '';
+      input.focus();
     }
-  } else {
-    // Exibe mensagem de erro e limpa o campo para nova tentativa.
-    document.getElementById('pwd-error').textContent = 'Senha incorreta. Tente novamente.';
-    document.getElementById('pwd-input').value = '';
+  } catch (err) {
+    console.error('Erro ao validar a senha:', err);
+    if (error) {
+      error.textContent = 'Não foi possível conectar ao servidor.';
+    }
   }
 }
 
